@@ -15,32 +15,35 @@ import (
 )
 
 var helpMessage = `
-install {go1.x} :
-    install the latest go1.x, 'x' must be a number, x >= 5
-    eg: "install go1.18", then you can run "go1.18"
+smart-go-dl subCommandX [options]
 
-clean {go1.x} :
-    clean up expired go versions.
-    lower than the latest version will be removed.
-    it will remove $GOBIN/{go1.x.y} and $HOME/sdk/{go1.x.y}
-    eg: "clean go1.15"
+SubCommands:
+    install {go1.x} :
+        install the latest go1.x, 'x' must be a number, x >= 5
+        eg: "install go1.18", then you can run "go1.18"
+    
+    clean {go1.x} :
+        clean up expired go versions.
+        lower than the latest version will be removed.
+        it will remove $GOBIN/{go1.x.y} and $HOME/sdk/{go1.x.y}
+        eg: "clean go1.15"
+    
+    lock {go1.x.y} :
+        add clean lock file.
+        eg: "lock go1.16.1"
+    
+    unlock {go1.x.y} :
+        remove clean lock file.
+        eg: "unlock go1.18beta1"
+    
+    update {go1.x} :
+        alias of "install {go1.x}" && "clean {go1.x}"
+    
+    list :
+        list all go versions that can be installed.
 
-lock {go1.x.y}:
-    add clean lock file.
-    eg: "lock go1.16.1"
-
-unlock {go1.x.y}:
-    remove clean lock file.
-    eg: "unlock go1.18beta1"
-
-update {go1.x} :
-    alias of "install {go1.x}" && "clean {go1.x}"
-
-list :
-    list all go versions that can be installed.
-
-update self :
-    go install github.com/fsgo/smart-go-dl@main
+Self-Update :
+          go install github.com/fsgo/smart-go-dl@main
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.0
