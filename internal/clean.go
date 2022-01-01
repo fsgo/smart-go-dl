@@ -50,28 +50,20 @@ func cleanVersion(v *Version) error {
 		return nil
 	}
 
-	ignoreFile := filepath.Join(sdkDir, "smart-go-dl.ignore_clean")
+	ignoreFile := filepath.Join(sdkDir, lockedName)
 	if _, err = os.Stat(ignoreFile); err == nil {
-		log.Println("clean ignored")
+		log.Println("[clean]", v.Raw, "locked")
 		return nil
 	}
 
 	bin := filepath.Join(GOBIN(), v.Raw)
-	log.Println("remove ", bin)
+	log.Println("[clean] remove ", bin)
 	if err = os.Remove(bin); err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	log.Println("remove ", sdkDir)
+	log.Println("[clean] remove ", sdkDir)
 	if err = os.RemoveAll(sdkDir); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 	return nil
-}
-
-func goroot(version string) (string, error) {
-	dir, err := sdkRoot()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(dir, version), nil
 }

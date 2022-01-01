@@ -39,7 +39,18 @@ func (v *Version) Installed() bool {
 		return false
 	}
 	info, err := os.Stat(sdk)
-	return err == nil && info.IsDir()
+	if err != nil || (err == nil && !info.IsDir()) {
+		return false
+	}
+	_, err = os.Readlink(sdk)
+	if err != nil {
+		return true
+	}
+	return false
+}
+
+func (v *Version) DlDir() string {
+	return filepath.Join(TmpDir(), "dl", v.Raw)
 }
 
 var versionReg = regexp.MustCompile(`^(go1\.\d+)((\.\d+)|(rc\d+)|(beta\d+))?$`)
@@ -80,15 +91,14 @@ func parserVersion(version string) (*Version, error) {
 }
 
 func LastVersions() (map[string][]*Version, error) {
-	os.Chdir("/Users/baidu/tmp/dl")
-
-	matches, err := filepath.Glob("go1.*")
+	pt := filepath.Join(TmpDir(), "dl", "go1.*")
+	matches, err := filepath.Glob(pt)
 	if err != nil {
 		return nil, err
 	}
 	versions := make(map[string][]*Version)
 	for _, name := range matches {
-		vv, err := parserVersion(name)
+		vv, err := parserVersion(filepath.Base(name))
 		if err != nil {
 			continue
 		}
@@ -98,6 +108,13 @@ func LastVersions() (map[string][]*Version, error) {
 			b := versions[vv.Normalized][j]
 			return a.Num >= b.Num
 		})
+	}
+	versions["gotip"] = []*Version{
+		{
+			Raw:        "gotip",
+			Normalized: "gotip",
+			Num:        2000000,
+		},
 	}
 	return versions, nil
 }

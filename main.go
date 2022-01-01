@@ -25,7 +25,13 @@ clean {go1.x} :
     it will remove $GOBIN/{go1.x.y} and $HOME/sdk/{go1.x.y}
     eg: "clean go1.15"
 
-    add $HOME/sdk/{go1.x.y}/smart-go-dl.ignore_clean to ignore clean
+lock {go1.x.y}:
+    add clean lock file.
+    eg: "lock go1.16.1"
+
+unlock {go1.x.y}:
+    remove clean lock file.
+    eg: "unlock go1.18beta1"
 
 update {go1.x} :
     alias of "install {go1.x}" && "clean {go1.x}"
@@ -70,6 +76,10 @@ func main() {
 		err = internal.Clean(args.get(2))
 	case "update":
 		err = internal.Update(args.get(2))
+	case "lock":
+		err = internal.Lock(args.get(2), "add")
+	case "unlock":
+		err = internal.Lock(args.get(2), "remove")
 	case "list":
 		err = internal.List()
 	default:
