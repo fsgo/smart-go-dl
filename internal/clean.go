@@ -32,7 +32,6 @@ func Clean(version string) error {
 
 	for i := 1; i < len(vinfos); i++ {
 		cur := vinfos[i]
-		log.Println("start clean", cur.Raw)
 		if err = cleanVersion(cur); err != nil {
 			log.Println("clean ", cur.Raw, "failed:", err)
 		}
@@ -45,6 +44,10 @@ func cleanVersion(v *Version) error {
 	sdkDir, err := goroot(v.Raw)
 	if err != nil {
 		return err
+	}
+
+	if _, err = os.Stat(sdkDir); err != nil && os.IsNotExist(err) {
+		return nil
 	}
 
 	ignoreFile := filepath.Join(sdkDir, "smart-go-dl.ignore_clean")

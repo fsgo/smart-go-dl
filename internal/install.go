@@ -98,10 +98,10 @@ func exe() string {
 }
 
 func Update(version string) error {
-	if err := Install(version); err != nil {
+	if err := Clean(version); err != nil {
 		return err
 	}
-	return Clean(version)
+	return Install(version)
 }
 
 func List() error {
