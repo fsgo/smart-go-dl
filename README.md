@@ -1,7 +1,7 @@
 # smart-go-dl
-go 多版本管理辅助工具, 可以快速安装 go1.x 版本的最新版本，并对过期版本进行清理。  
+Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新版本，并对过期版本进行清理。  
 
-依赖 https://github.com/golang/dl
+底层使用 https://github.com/golang/dl 来进行多 Go 版本的安装。
 
 请提前设置好环境变量 `$GOBIN`,若没有设置不能正常工作。
 
