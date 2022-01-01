@@ -34,7 +34,7 @@ list :
     list all go versions that can be installed.
 
 update self :
-    go install github.com/fsgo/smart-go-dl@master
+    go install github.com/fsgo/smart-go-dl@main
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.0

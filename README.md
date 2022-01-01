@@ -7,7 +7,7 @@ go 多版本管理辅助工具, 可以快速安装 go1.x 版本的最新版本�
 
 ## 安装/更新
 ```bash
-go install github.com/fsgo/smart-go-dl@master
+go install github.com/fsgo/smart-go-dl@main
 ```
 
 ## 查看使用帮助
