@@ -26,3 +26,13 @@ func Lock(version string, action string) error {
 	}
 	return ioutil.WriteFile(name, []byte("clean locked"), 0655)
 }
+
+func isLocked(version string) bool {
+	sdk, err := goroot(version)
+	if err != nil {
+		return false
+	}
+	name := filepath.Join(sdk, lockedName)
+	_, err = os.Stat(name)
+	return err == nil
+}

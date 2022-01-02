@@ -18,20 +18,20 @@ func Clean(version string) error {
 		return err
 	}
 
-	vinfos := versions[version]
-	if len(vinfos) == 0 {
+	mv := versions.Get(version)
+	if mv == nil {
 		return fmt.Errorf("version %q not found", version)
 	}
 
-	log.Printf("%s has total %d versions, latest is %q\n", version, len(vinfos), vinfos[0].Raw)
+	log.Printf("%s has total %d versions, latest is %q\n", version, len(mv.PatchVersions), mv.Latest().Raw)
 
-	if len(vinfos) < 2 {
+	if len(mv.PatchVersions) < 2 {
 		log.Println("no old versions need to be clean")
 		return nil
 	}
 
-	for i := 1; i < len(vinfos); i++ {
-		cur := vinfos[i]
+	for i := 1; i < len(mv.PatchVersions); i++ {
+		cur := mv.PatchVersions[i]
 		if err = cleanVersion(cur); err != nil {
 			log.Println("clean ", cur.Raw, "failed:", err)
 		}

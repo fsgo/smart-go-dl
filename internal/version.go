@@ -110,7 +110,36 @@ func parserVersion(version string) (*Version, error) {
 	return vv, nil
 }
 
-func LastVersions() (map[string][]*Version, error) {
+type MinorVersion struct {
+	NormalizedVersion string
+	PatchVersions     []*Version
+}
+
+func (mv *MinorVersion) Latest() *Version {
+	return mv.PatchVersions[0]
+}
+
+func (mv *MinorVersion) Installed() bool {
+	for _, pv := range mv.PatchVersions {
+		if pv.Installed() {
+			return true
+		}
+	}
+	return false
+}
+
+type Versions []*MinorVersion
+
+func (vs Versions) Get(version string) *MinorVersion {
+	for _, mv := range vs {
+		if mv.NormalizedVersion == version {
+			return mv
+		}
+	}
+	return nil
+}
+
+func LastVersions() (Versions, error) {
 	pt := filepath.Join(TmpDir(), "dl", "go1.*")
 	matches, err := filepath.Glob(pt)
 	if err != nil {
@@ -129,6 +158,7 @@ func LastVersions() (map[string][]*Version, error) {
 			return a.Num >= b.Num
 		})
 	}
+
 	versions["gotip"] = []*Version{
 		{
 			Raw:        "gotip",
@@ -136,5 +166,26 @@ func LastVersions() (map[string][]*Version, error) {
 			Num:        2000000,
 		},
 	}
-	return versions, nil
+
+	var result Versions
+	for v, list := range versions {
+		sort.Slice(list, func(i, j int) bool {
+			a := list[i]
+			b := list[j]
+			return a.Num > b.Num
+		})
+		mv := &MinorVersion{
+			NormalizedVersion: v,
+			PatchVersions:     list,
+		}
+		result = append(result, mv)
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		a := result[i]
+		b := result[j]
+		return a.Latest().Num > b.Latest().Num
+	})
+
+	return result, nil
 }

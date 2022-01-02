@@ -39,7 +39,10 @@ SubCommands:
         eg: "unlock go1.18beta1"
     
     update {go1.x} :
-        alias of "install {go1.x}" && "clean {go1.x}"
+        alias of  "clean {go1.x}" && "install {go1.x}"
+
+    update all :
+        update all installed go versions
     
     list :
         list all go versions that can be installed.

@@ -10,6 +10,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -19,8 +21,8 @@ func Install(version string) error {
 	if err != nil {
 		return err
 	}
-	vinfos := versions[version]
-	if len(vinfos) == 0 {
+	mv := versions.Get(version)
+	if mv == nil {
 		// 用于支持安装 3 位版本，如  go1.16.0、go1.16.3
 		err = installVV(version, versions)
 		if err == nil {
@@ -28,7 +30,7 @@ func Install(version string) error {
 		}
 		return fmt.Errorf("install %q failed: %w", version, err)
 	}
-	last := vinfos[0]
+	last := mv.Latest()
 
 	log.Println("[install]", "found last", version, "version is", last.Raw)
 
@@ -101,12 +103,30 @@ func installWithVersion(ver *Version) error {
 	log.Println("[exec]", downloadCmd.String())
 	downloadCmd.Stderr = os.Stderr
 	downloadCmd.Stdout = os.Stdout
-	return downloadCmd.Run()
+	err := downloadCmd.Run()
+	if err == nil {
+		removeGoTmpTar(ver.Raw)
+	}
+	return err
+}
+
+func removeGoTmpTar(version string) {
+	sdk, err := sdkRoot()
+	if err != nil {
+		return
+	}
+	tmpTar := filepath.Join(sdk, version, version+"."+runtime.GOOS+"-"+runtime.GOARCH+".tar.gz")
+	_, err = os.Stat(tmpTar)
+	if err == nil {
+		log.Println("[remove]", tmpTar)
+		_ = os.Remove(tmpTar)
+	}
+
 }
 
 // installVV 安装指定的小版本
-func installVV(version string, vvs map[string][]*Version) error {
-	if len(vvs[version]) > 0 {
+func installVV(version string, vvs Versions) error {
+	if vvs.Get(version) != nil {
 		// 不应该执行到这个逻辑
 		return fmt.Errorf("now allow, bug here")
 	}
@@ -114,14 +134,14 @@ func installVV(version string, vvs map[string][]*Version) error {
 	if err != nil {
 		return err
 	}
-	mvs := vvs[vu.Normalized]
-	if len(mvs) == 0 {
+	mv := vvs.Get(vu.Normalized)
+	if mv == nil {
 		return fmt.Errorf("minor version not found")
 	}
 	var installVersion *Version
-	for _, mv := range mvs {
-		if mv.Raw == version || mv.Raw+".0" == version {
-			installVersion = mv
+	for _, pv := range mv.PatchVersions {
+		if pv.Raw == version || pv.Raw+".0" == version {
+			installVersion = pv
 			break
 		}
 	}

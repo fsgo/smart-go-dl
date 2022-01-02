@@ -25,7 +25,7 @@ func Download() error {
 	if err == nil {
 		// 短期内更新过的
 		// 这个库本来更新也非常少
-		if info != nil && time.Since(info.ModTime()) < 10*time.Minute {
+		if info != nil && time.Since(info.ModTime()) < 1*time.Hour {
 			return nil
 		}
 
