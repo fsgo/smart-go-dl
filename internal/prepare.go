@@ -19,7 +19,7 @@ func Prepare() error {
 		return err
 	}
 
-	log.Println("InitTmpDir:", tmpDir)
+	log.Println("Use TmpDir:", tmpDir)
 
 	if err = os.MkdirAll(tmpDir, 0777); err != nil && !os.IsExist(err) {
 		return err

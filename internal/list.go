@@ -37,12 +37,14 @@ func List() error {
 		cell1 := v
 		localFormat := format
 		installed := strings.Join(installedVersions(infos), " ")
-		if latest.Installed() {
-			cell1 = green(v)
-			localFormat = formatColor
-		} else if len(installed) > 0 {
-			cell1 = yellow(v)
-			localFormat = formatColor
+		if !isWindows() {
+			if latest.Installed() {
+				cell1 = green(v)
+				localFormat = formatColor
+			} else if len(installed) > 0 {
+				cell1 = yellow(v)
+				localFormat = formatColor
+			}
 		}
 		fmt.Printf(localFormat, cell1, latest.Raw, installed)
 	}
@@ -53,7 +55,7 @@ func installedVersions(vs []*Version) []string {
 	var result []string
 	for _, v := range vs {
 		if v.Installed() {
-			result = append(result, fmt.Sprintf("%-12s", v.Raw))
+			result = append(result, fmt.Sprintf("%-12s", v.RawFormatted()))
 		}
 	}
 	return result

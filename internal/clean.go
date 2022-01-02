@@ -56,14 +56,9 @@ func cleanVersion(v *Version) error {
 		return nil
 	}
 
-	// 是软连接
-	if _, err = os.Readlink(sdkDir); err == nil {
-		return nil
-	}
-
-	bin := filepath.Join(GOBIN(), v.Raw)
-	log.Println("[clean] remove ", bin)
-	if err = os.Remove(bin); err != nil && !os.IsNotExist(err) {
+	goBin := v.RawGoBinPath()
+	log.Println("[clean] remove ", goBin)
+	if err = os.Remove(goBin); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 	log.Println("[clean] remove ", sdkDir)

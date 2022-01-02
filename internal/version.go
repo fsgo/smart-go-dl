@@ -33,6 +33,26 @@ func (v *Version) String() string {
 	return string(bf)
 }
 
+var regNumSuf = regexp.MustCompile(`\.\d+$`)
+
+func (v *Version) RawGoBinPath() string {
+	return filepath.Join(GOBIN(), v.RawFormatted()) + exe()
+}
+
+func (v *Version) RawFormatted() string {
+	name := v.Raw
+	// 如 原始版本的 go1.16，实际应该是 go1.16.0
+	// 用正则过滤掉非数字版本，如 gotip
+	if regNumSuf.MatchString(v.Raw) && v.Raw == v.Normalized {
+		name += ".0"
+	}
+	return name
+}
+
+func (v *Version) NormalizedGoBinPath() string {
+	return filepath.Join(GOBIN(), v.Normalized) + exe()
+}
+
 func (v *Version) Installed() bool {
 	sdk, err := goroot(v.Raw)
 	if err != nil {

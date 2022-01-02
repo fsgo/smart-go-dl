@@ -3,7 +3,15 @@ Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新
 
 底层使用 https://github.com/golang/dl 来进行多 Go 版本的安装。
 
-请提前设置好环境变量 `$GOBIN`,若没有设置不能正常工作。
+依赖：
+ 1. git 工具
+ 2. 环境变量 `$GOBIN`
+
+```bash
+export GOBIN=$HOME/go/bin
+
+export PATH=$PATH:$GOBIN
+```
 
 ## 安装/更新
 ```bash

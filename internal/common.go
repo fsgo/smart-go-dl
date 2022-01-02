@@ -7,6 +7,7 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -42,12 +43,20 @@ func TmpDir() string {
 var goBinPath string
 
 func ParserGOBIN() error {
-	paths := strings.Split(os.Getenv("GOBIN"), ":")
-	if len(paths) == 0 {
+	paths := getEnvSlice("GOBIN")
+	if len(paths) == 0 || len(paths[0]) == 0 {
 		return fmt.Errorf("GOBIN has not setted")
 	}
 	goBinPath = paths[0]
 	return nil
+}
+
+func getEnvSlice(key string) []string {
+	sep := ":"
+	if isWindows() {
+		sep = ";"
+	}
+	return strings.Split(os.Getenv(key), sep)
 }
 
 func GOBIN() string {
@@ -60,10 +69,14 @@ func GOBIN() string {
 }
 
 func exe() string {
-	if runtime.GOOS == "windows" {
+	if isWindows() {
 		return ".exe"
 	}
 	return ""
+}
+
+func isWindows() bool {
+	return runtime.GOOS == "windows"
 }
 
 func goroot(version string) (string, error) {
@@ -127,4 +140,23 @@ func homedir() (string, error) {
 		}
 		return "", errors.New("can't find user home directory; $HOME is empty")
 	}
+}
+
+func copyFile(src, dst string) error {
+	sf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sf.Close()
+	si, err := sf.Stat()
+	if err != nil {
+		return err
+	}
+	df, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_RDWR, si.Mode())
+	if err != nil {
+		return err
+	}
+	defer df.Close()
+	_, err = io.Copy(df, sf)
+	return err
 }

@@ -20,7 +20,9 @@ smart-go-dl subCommandX [options]
 SubCommands:
     install {go1.x} :
         install the latest go1.x, 'x' must be a number, x >= 5
-        eg: "install go1.18", then you can run "go1.18"
+          eg: "install go1.18", then you can run "go1.18"
+        install the specified version:
+          eg: install go1.17.0 | go1.17.3 | gotip
     
     clean {go1.x} :
         clean up expired go versions.
@@ -47,7 +49,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.0
-Date    : 2022-01-01
+Date    : 2022-01-02
 `
 
 func init() {
