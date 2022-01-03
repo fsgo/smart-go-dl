@@ -25,7 +25,7 @@ func Prepare() error {
 		return err
 	}
 
-	if err = os.Chdir(tmpDir); err != nil {
+	if err = chdir(tmpDir); err != nil {
 		return err
 	}
 	return Download()

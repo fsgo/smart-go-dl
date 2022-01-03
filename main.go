@@ -15,7 +15,7 @@ import (
 )
 
 var helpMessage = `
-smart-go-dl subCommandX [options]
+smart-go-dl subCommand [options]
 
 SubCommands:
     install {go1.x} :
@@ -38,11 +38,12 @@ SubCommands:
         remove clean lock file.
         eg: "unlock go1.18beta1"
     
-    update {go1.x} :
+    update {go1.x} / all :
         alias of  "clean {go1.x}" && "install {go1.x}"
+        all: update all installed go versions
 
-    update all :
-        update all installed go versions
+    remove {go1.x.y} :
+        remove patch version like 'go1.12.1'
     
     list :
         list all go versions that can be installed.
@@ -52,7 +53,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.0
-Date    : 2022-01-02
+Date    : 2022-01-03
 `
 
 func init() {
@@ -90,6 +91,8 @@ func main() {
 		err = internal.Lock(args.get(2), "remove")
 	case "list":
 		err = internal.List()
+	case "remove", "uninstall":
+		err = internal.Remove(args.get(2))
 	default:
 		err = fmt.Errorf("not support")
 	}

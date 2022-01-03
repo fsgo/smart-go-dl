@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -27,6 +28,16 @@ func InitTmpDir() (string, error) {
 	}
 	gTmpDir = filepath.Join(sdk, "smart-go-dl")
 	return gTmpDir, nil
+}
+
+func chdir(dir string) error {
+	err := os.Chdir(dir)
+	if err == nil {
+		log.Println("[chdir]", dir)
+	} else {
+		log.Println("[chdir]", dir, "failed:", err)
+	}
+	return err
 }
 
 func TmpDir() string {

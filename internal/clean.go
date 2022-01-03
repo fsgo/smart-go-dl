@@ -36,7 +36,6 @@ func Clean(version string) error {
 			log.Println("clean ", cur.Raw, "failed:", err)
 		}
 	}
-
 	return nil
 }
 

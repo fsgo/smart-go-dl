@@ -15,12 +15,16 @@ import (
 )
 
 const dlStatsFile = "dl.status"
+const golangDLDir = "golang_dl"
 
 func Download() error {
 	dlStatsPath := filepath.Join(TmpDir(), dlStatsFile)
+	writeStats := func() {
+		_ = ioutil.WriteFile(dlStatsPath, []byte(time.Now().String()), 0655)
+	}
 	info, _ := os.Stat(dlStatsPath)
 
-	dlDir := filepath.Join(TmpDir(), "dl")
+	dlDir := filepath.Join(TmpDir(), golangDLDir)
 	_, err := os.Stat(dlDir)
 	if err == nil {
 		// 短期内更新过的
@@ -29,7 +33,7 @@ func Download() error {
 			return nil
 		}
 
-		if err = os.Chdir(dlDir); err != nil {
+		if err = chdir(dlDir); err != nil {
 			return err
 		}
 
@@ -44,17 +48,23 @@ func Download() error {
 			log.Println("skipped error: git pull failed, ", err)
 			// 忽略异常,可能由于 Q 的存在，更新最新版本不是很稳定
 		}
-		_ = ioutil.WriteFile(dlStatsPath, []byte(time.Now().String()), 0655)
+		writeStats()
 		return nil
 	}
+
 	args := []string{
 		"clone",
 		"https://github.com/golang/dl.git",
+		golangDLDir,
 	}
 	cmdClone := exec.Command("git", args...)
 	log.Println("[exec]", cmdClone.String())
 	cmdClone.Stdin = os.Stdin
 	cmdClone.Stderr = os.Stderr
 	cmdClone.Stdout = os.Stdout
-	return cmdClone.Run()
+	if err = cmdClone.Run(); err != nil {
+		return err
+	}
+	writeStats()
+	return nil
 }

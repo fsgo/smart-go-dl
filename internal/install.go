@@ -82,9 +82,8 @@ func Install(version string) error {
 }
 
 func installWithVersion(ver *Version) error {
-	defer os.Chdir(TmpDir())
 	log.Println("[chdir]", ver.DlDir())
-	if err := os.Chdir(ver.DlDir()); err != nil {
+	if err := chdir(ver.DlDir()); err != nil {
 		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -106,6 +105,7 @@ func installWithVersion(ver *Version) error {
 	err := downloadCmd.Run()
 	if err == nil {
 		removeGoTmpTar(ver.Raw)
+		log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
 	}
 	return err
 }

@@ -13,8 +13,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
-	// "golang.org/x/mod/semver"
 )
 
 type Version struct {
@@ -70,7 +68,7 @@ func (v *Version) Installed() bool {
 }
 
 func (v *Version) DlDir() string {
-	return filepath.Join(TmpDir(), "dl", v.Raw)
+	return filepath.Join(TmpDir(), golangDLDir, v.Raw)
 }
 
 var versionReg = regexp.MustCompile(`^(go1\.\d+)((\.\d+)|(rc\d+)|(beta\d+))?$`)
@@ -140,7 +138,7 @@ func (vs Versions) Get(version string) *MinorVersion {
 }
 
 func LastVersions() (Versions, error) {
-	pt := filepath.Join(TmpDir(), "dl", "go1.*")
+	pt := filepath.Join(TmpDir(), golangDLDir, "go1.*")
 	matches, err := filepath.Glob(pt)
 	if err != nil {
 		return nil, err
