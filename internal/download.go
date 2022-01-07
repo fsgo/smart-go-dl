@@ -17,6 +17,7 @@ import (
 const dlStatsFile = "dl.status"
 const golangDLDir = "golang_dl"
 
+// Download 下载 golang/dl.git
 func Download() error {
 	dlStatsPath := filepath.Join(TmpDir(), dlStatsFile)
 	writeStats := func() {

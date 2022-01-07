@@ -9,8 +9,10 @@ import (
 	"log"
 )
 
+// Update 更新 go 版本，version 支持多种格式
+// 如 go1.16、go1.16.1、all
 func Update(version string) error {
-	if version == "all" {
+	if version == "all" || len(version) == 0 {
 		return updateAll()
 	}
 	return update(version)

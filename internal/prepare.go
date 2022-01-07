@@ -9,8 +9,9 @@ import (
 	"os"
 )
 
+// Prepare 在其他正式命令之前的预处理逻辑
 func Prepare() error {
-	tmpDir, err := InitTmpDir()
+	tmpDir, err := GetTmpDir()
 	if err != nil {
 		return err
 	}

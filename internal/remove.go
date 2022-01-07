@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Remove 删除指定的版本
 func Remove(version string) error {
 	return remove(version)
 }

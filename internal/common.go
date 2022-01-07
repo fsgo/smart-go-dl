@@ -18,7 +18,8 @@ import (
 
 var gTmpDir string
 
-func InitTmpDir() (string, error) {
+// GetTmpDir 获取当前应用的缓存目录
+func GetTmpDir() (string, error) {
 	if len(gTmpDir) != 0 {
 		return gTmpDir, nil
 	}
@@ -40,11 +41,12 @@ func chdir(dir string) error {
 	return err
 }
 
+// TmpDir 获取临时目录
 func TmpDir() string {
 	if len(gTmpDir) != 0 {
 		return gTmpDir
 	}
-	t, err := InitTmpDir()
+	t, err := GetTmpDir()
 	if err != nil {
 		panic(err)
 	}
@@ -53,6 +55,7 @@ func TmpDir() string {
 
 var goBinPath string
 
+// ParserGOBIN 解析 GOBIN 环境变量
 func ParserGOBIN() error {
 	paths := getEnvSlice("GOBIN")
 	if len(paths) == 0 || len(paths[0]) == 0 {
@@ -70,6 +73,7 @@ func getEnvSlice(key string) []string {
 	return strings.Split(os.Getenv(key), sep)
 }
 
+// GOBIN 获取 GOBIN 环境变量
 func GOBIN() string {
 	if len(goBinPath) == 0 {
 		if err := ParserGOBIN(); err != nil {

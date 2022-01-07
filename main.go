@@ -31,16 +31,14 @@ SubCommands:
         eg: "clean go1.15"
     
     lock {go1.x.y} :
-        add clean lock file.
-        eg: "lock go1.16.1"
+        add lock file. eg: "lock go1.16.1"
     
     unlock {go1.x.y} :
-        remove clean lock file.
-        eg: "unlock go1.18beta1"
+        remove lock file. eg: "unlock go1.18beta1"
     
     update {go1.x} / all :
         alias of  "clean {go1.x}" && "install {go1.x}"
-        all: update all installed go versions
+        "all": update all installed go versions, eg: "update all" or "update"
 
     remove {go1.x.y} :
         remove patch version like 'go1.12.1'
@@ -53,7 +51,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.0
-Date    : 2022-01-03
+Date    : 2022-01-08
 `
 
 func init() {

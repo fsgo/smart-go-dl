@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// List 列出已安装和可安装的 go 版本
 func List() error {
 	versions, err := LastVersions()
 	if err != nil {

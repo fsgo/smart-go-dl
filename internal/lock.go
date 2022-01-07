@@ -12,6 +12,7 @@ import (
 
 const lockedName = "smart-go-dl.locked"
 
+// Lock 给指定版本添加 lock 标记文件
 func Lock(version string, action string) error {
 	sdk, err := goroot(version)
 	if err != nil {

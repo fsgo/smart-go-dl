@@ -15,6 +15,7 @@ import (
 	"strings"
 )
 
+// Version go 版本信息
 type Version struct {
 	// 原始的版本号，如 go1.10，go1.9rc2，go1.18beta1
 	Raw string
@@ -26,6 +27,7 @@ type Version struct {
 	Normalized string
 }
 
+// String 格式化输出
 func (v *Version) String() string {
 	bf, _ := json.Marshal(v)
 	return string(bf)
@@ -33,10 +35,13 @@ func (v *Version) String() string {
 
 var regNumSuf = regexp.MustCompile(`\.\d+$`)
 
+// RawGoBinPath 当前版本原始的 go 命令地址，如 $GOBIN/go1.16.1
 func (v *Version) RawGoBinPath() string {
 	return filepath.Join(GOBIN(), v.RawFormatted()) + exe()
 }
 
+// RawFormatted 真实的 3 位版本好，如 go1.16.1
+// 若是 go1.16 这种第一个正式版本，会将其转换为 go1.16.0
 func (v *Version) RawFormatted() string {
 	name := v.Raw
 	// 如 原始版本的 go1.16，实际应该是 go1.16.0
@@ -47,10 +52,14 @@ func (v *Version) RawFormatted() string {
 	return name
 }
 
+// NormalizedGoBinPath 归一化到 2 位版本的 gobin 的路径
+// 如 $GOBIN/go1.16、$GOBIN/go1.17
+// 在 mac、linux 下一般是一个软链，链接到当前 2 位版本的最新3位版本的gobin
 func (v *Version) NormalizedGoBinPath() string {
 	return filepath.Join(GOBIN(), v.Normalized) + exe()
 }
 
+// Installed 该版本是否已经安装过了
 func (v *Version) Installed() bool {
 	sdk, err := goroot(v.Raw)
 	if err != nil {
@@ -67,6 +76,7 @@ func (v *Version) Installed() bool {
 	return false
 }
 
+// DlDir 当前版本在缓存的 golang/dl 下的路径
 func (v *Version) DlDir() string {
 	return filepath.Join(TmpDir(), golangDLDir, v.Raw)
 }
@@ -108,15 +118,18 @@ func parserVersion(version string) (*Version, error) {
 	return vv, nil
 }
 
+// MinorVersion 次要版本信息
 type MinorVersion struct {
 	NormalizedVersion string
 	PatchVersions     []*Version
 }
 
+// Latest 最新的版本
 func (mv *MinorVersion) Latest() *Version {
 	return mv.PatchVersions[0]
 }
 
+// Installed 是否已安装过了
 func (mv *MinorVersion) Installed() bool {
 	for _, pv := range mv.PatchVersions {
 		if pv.Installed() {
@@ -126,8 +139,11 @@ func (mv *MinorVersion) Installed() bool {
 	return false
 }
 
+// Versions 一系列版本号
 type Versions []*MinorVersion
 
+// Get 获取指定的次要版本
+// 参数 version需要是一个归一化的次要版本，如 go1.16
 func (vs Versions) Get(version string) *MinorVersion {
 	for _, mv := range vs {
 		if mv.NormalizedVersion == version {
@@ -137,6 +153,7 @@ func (vs Versions) Get(version string) *MinorVersion {
 	return nil
 }
 
+// LastVersions 获取 golang/dl里所有的版本信息
 func LastVersions() (Versions, error) {
 	pt := filepath.Join(TmpDir(), golangDLDir, "go1.*")
 	matches, err := filepath.Glob(pt)
