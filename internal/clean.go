@@ -23,7 +23,7 @@ func Clean(version string) error {
 		return fmt.Errorf("version %q not found", version)
 	}
 
-	log.Printf("%s has total %d versions, latest is %q\n", version, len(mv.PatchVersions), mv.Latest().Raw)
+	log.Printf("[clean] %s has total %d versions, latest is %q\n", version, len(mv.PatchVersions), mv.Latest().Raw)
 
 	if len(mv.PatchVersions) < 2 {
 		log.Println("no old versions need to be clean")
@@ -33,7 +33,7 @@ func Clean(version string) error {
 	for i := 1; i < len(mv.PatchVersions); i++ {
 		cur := mv.PatchVersions[i]
 		if err = cleanVersion(cur); err != nil {
-			log.Println("clean ", cur.Raw, "failed:", err)
+			log.Println("[clean] clean", cur.Raw, "failed:", err)
 		}
 	}
 	return nil

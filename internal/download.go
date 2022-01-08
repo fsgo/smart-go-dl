@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const dlStatsFile = "dl.status"
+const dlStatsFile = "download.status"
 const golangDLDir = "golang_dl"
 
 // Download 下载 golang/dl.git
@@ -41,7 +41,7 @@ func Download() error {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 
-		cmdPull := exec.CommandContext(ctx, "git", "pull")
+		cmdPull := exec.CommandContext(ctx, "git", "pull", "-v")
 		log.Println("[exec]", cmdPull.String())
 		cmdPull.Stderr = os.Stderr
 		cmdPull.Stdout = os.Stdout
@@ -53,11 +53,13 @@ func Download() error {
 		return nil
 	}
 
-	args := []string{
-		"clone",
-		"https://github.com/golang/dl.git",
-		golangDLDir,
+	repo := "git@github.com:golang/dl.git"
+	if isWindows() {
+		// windows 下使用 https 协议可能遇到更少的问题
+		repo = "https://github.com/golang/dl.git"
 	}
+
+	args := []string{"clone", repo, golangDLDir}
 	cmdClone := exec.Command("git", args...)
 	log.Println("[exec]", cmdClone.String())
 	cmdClone.Stdin = os.Stdin
