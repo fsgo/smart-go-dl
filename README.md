@@ -5,20 +5,20 @@ Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新
 
 依赖：
  1. 安装过 git，内部使用了 `git clone` 和 `git pull` 命令
- 2. 安装过一个 Go 版本（ https://go.dev/dl/ ），内部用了 `go build` 命令
- 3. 需要设置环境变量 `$GOBIN`，可参考如下：
+ 2. 需要设置环境变量 `$GOBIN`，可参考如下进行配置：
 ```bash
-export GOBIN=$HOME/go/bin
+export GOBIN=$HOME/go/bin   # go install 安装的二进制文件所在目录，go1.x命令也将安装到此目录
 
-export PATH=$PATH:$GOBIN
+export PATH=$PATH:$GOBIN    # 可以直接在任意位置使用 GOBIN 目录下的所有命令
 ```
 若之前安装的 `go1.x` 命令(`go`命令不受影响)不在上述 `$GOBIN` 路径里，请删除掉或者移动到 `$GOBIN` 里，
 以避免使用`smart-go-dl` install 或者 clean 后，使用命令 `go1.x`(如 go.16) 使用的是旧版本的。
 
 ## 安装/更新
-未安装过 Go 的，请先在 https://go.dev/dl/ 下载安装 Go 。
+未安装过 Go 的，请先在 https://go.dev/dl/ 下载安装 Go，
+若非 windows 系统(如 Linux & mac )，也可以直接 [下载编译好的二进制文件](https://github.com/fsgo/smart-go-dl/releases) 。
 
-已安装过 Go 后：
+已安装过 Go ，安装和更新：
 ```bash
 go install github.com/fsgo/smart-go-dl@main
 ```

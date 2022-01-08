@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -32,7 +34,7 @@ func Install(version string) error {
 	}
 	last := mv.Latest()
 
-	log.Println("[install]", "found last", version, "version is", last.Raw)
+	log.Printf("[install] found %s's latest version is %s\n", version, last.Raw)
 
 	goBinTo := last.RawGoBinPath()
 
@@ -82,19 +84,35 @@ func Install(version string) error {
 }
 
 func installWithVersion(ver *Version) error {
-	log.Println("[chdir]", ver.DlDir())
-	if err := chdir(ver.DlDir()); err != nil {
+	gb, err := findGoBin()
+	if err != nil {
+		if !isWindows() {
+			// 当没有找到 go 的时候，尝试直接使用下载编译好的 go
+			err = installByArchive(ver.Raw)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	gb, err = findGoBin()
+	if err != nil {
+		return err
+	}
+
+	if err = chdir(ver.DlDir()); err != nil {
 		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	goBinTo := ver.RawGoBinPath()
-	cmd := exec.CommandContext(ctx, "go", "build", "-o", goBinTo)
+
+	cmd := exec.CommandContext(ctx, gb, "build", "-o", goBinTo)
 	log.Println("[exec]", cmd.String())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	if err := cmd.Run(); err != nil {
+	if err = cmd.Run(); err != nil {
 		return err
 	}
 
@@ -102,7 +120,7 @@ func installWithVersion(ver *Version) error {
 	log.Println("[exec]", downloadCmd.String())
 	downloadCmd.Stderr = os.Stderr
 	downloadCmd.Stdout = os.Stdout
-	err := downloadCmd.Run()
+	err = downloadCmd.Run()
 	if err == nil {
 		removeGoTmpTar(ver.Raw)
 		log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
@@ -149,4 +167,87 @@ func installVV(version string, vvs Versions) error {
 		return fmt.Errorf("version not found")
 	}
 	return installWithVersion(installVersion)
+}
+
+func findGoBin() (string, error) {
+	gb := "go" + exe()
+	if p, err := exec.LookPath(gb); err == nil {
+		return p, nil
+	}
+	if ep := findGoInSdkDir(); len(ep) > 0 {
+		return ep, nil
+	}
+
+	return gb, fmt.Errorf("cannot find %q in $PATH", gb)
+}
+
+// 查找 ~/sdk/ 目录下已经安装的 go 版本
+func findGoInSdkDir() string {
+	sr, err := sdkRoot()
+	if err != nil {
+		return ""
+	}
+	ms, err := filepath.Glob(filepath.Join(sr, "go*"))
+	if err != nil {
+		return ""
+	}
+	sort.Slice(ms, func(i, j int) bool {
+		return strings.Compare(ms[i], ms[j]) >= 0
+	})
+	for _, m := range ms {
+		if ep, err := exec.LookPath(filepath.Join(m, "bin", "go"+exe())); err == nil {
+			return ep
+		}
+	}
+	return ""
+}
+
+func installByArchive(version string) error {
+	gr, err := goroot(version)
+	if err != nil {
+		return err
+	}
+	if err = os.MkdirAll(gr, 0755); err != nil && !os.IsExist(err) {
+		return err
+	}
+	if err = chdir(gr); err != nil {
+		return err
+	}
+	u := versionArchiveURL(version)
+	out := u[strings.LastIndex(u, "/")+1:]
+	cmd := exec.Command("wget", u, "-O", out)
+	log.Println("[exec]", cmd.String())
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	if err = cmd.Run(); err != nil {
+		return err
+	}
+	if err = unpackArchive(out); err != nil {
+		return err
+	}
+	return nil
+}
+
+func unpackArchive(f string) error {
+	cmd := exec.Command("tar", "-xzf", f, "--strip-components", "1")
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	log.Println("[exec]", cmd.String())
+	return cmd.Run()
+}
+
+func versionArchiveURL(version string) string {
+	goos := getOS()
+
+	ext := ".tar.gz"
+	if goos == "windows" {
+		ext = ".zip"
+	}
+	arch := runtime.GOARCH
+	if goos == "linux" && runtime.GOARCH == "arm" {
+		arch = "armv6l"
+	}
+	return "https://dl.google.com/go/" + version + "." + goos + "-" + arch + ext
 }

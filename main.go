@@ -50,7 +50,7 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@main
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.0
+Version : 0.1.1
 Date    : 2022-01-08
 `
 
@@ -58,7 +58,7 @@ func init() {
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
 		fmt.Fprintf(out, "Usage of %s:\n", os.Args[0])
-		fmt.Fprintf(out, strings.TrimSpace(helpMessage))
+		fmt.Fprintf(out, strings.TrimSpace(helpMessage)+"\n")
 	}
 }
 

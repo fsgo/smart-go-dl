@@ -53,11 +53,7 @@ func Download() error {
 		return nil
 	}
 
-	repo := "git@github.com:golang/dl.git"
-	if isWindows() {
-		// windows 下使用 https 协议可能遇到更少的问题
-		repo = "https://github.com/golang/dl.git"
-	}
+	repo := "https://github.com/golang/dl.git"
 
 	args := []string{"clone", repo, golangDLDir}
 	cmdClone := exec.Command("git", args...)
