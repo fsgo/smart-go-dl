@@ -51,7 +51,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.1
-Date    : 2022-01-08
+Date    : 2022-01-09
 `
 
 func init() {

@@ -5,12 +5,10 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -122,7 +120,7 @@ func colorText(txt string, color int) string {
 }
 
 func sdkRoot() (string, error) {
-	home, err := homedir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("failed to get home directory: %v", err)
 	}
@@ -131,30 +129,6 @@ func sdkRoot() (string, error) {
 
 func getOS() string {
 	return runtime.GOOS
-}
-
-func homedir() (string, error) {
-	// This could be replaced with os.UserHomeDir, but it was introduced too
-	// recently, and we want this to work with go as packaged by Linux
-	// distributions. Note that user.Current is not enough as it does not
-	// prioritize $HOME. See also Issue 26463.
-	switch getOS() {
-	case "plan9":
-		return "", fmt.Errorf("%q not yet supported", runtime.GOOS)
-	case "windows":
-		if dir := os.Getenv("USERPROFILE"); dir != "" {
-			return dir, nil
-		}
-		return "", errors.New("can't find user home directory; %USERPROFILE% is empty")
-	default:
-		if dir := os.Getenv("HOME"); dir != "" {
-			return dir, nil
-		}
-		if u, err := user.Current(); err == nil && u.HomeDir != "" {
-			return u.HomeDir, nil
-		}
-		return "", errors.New("can't find user home directory; $HOME is empty")
-	}
 }
 
 func copyFile(src, dst string) error {

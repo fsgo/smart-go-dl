@@ -58,7 +58,7 @@ func Install(version string) error {
 				return err
 			}
 		} else {
-			if err = os.Symlink(goBinTo, goBinLink); err != nil {
+			if err = os.Symlink(filepath.Base(goBinTo), goBinLink); err != nil {
 				return err
 			}
 		}
