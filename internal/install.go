@@ -15,6 +15,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/fsgo/cmdutils"
 )
 
 // Install 安装 go1.x 的最新版本
@@ -86,10 +88,8 @@ func Install(version string) error {
 func installWithVersion(ver *Version) error {
 	gb, err := findGoBin()
 	if err != nil {
-		if !isWindows() {
-			// 当没有找到 go 的时候，尝试直接使用下载编译好的 go
-			err = installByArchive(ver.Raw)
-		}
+		// 当没有找到 go 的时候，尝试直接使用下载编译好的 go
+		err = installByArchive(ver.Raw)
 		if err != nil {
 			return err
 		}
@@ -215,14 +215,11 @@ func installByArchive(version string) error {
 	}
 	u := versionArchiveURL(version)
 	out := u[strings.LastIndex(u, "/")+1:]
-	cmd := exec.Command("wget", u, "-O", out)
-	log.Println("[exec]", cmd.String())
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	if err = cmd.Run(); err != nil {
-		return err
+	wget := &cmdutils.Wget{
+		PrintProgress: os.Stderr,
 	}
+	log.Println("[download] from", u, "to", out)
+	return wget.Download(u, out)
 	if err = unpackArchive(out); err != nil {
 		return err
 	}
@@ -230,12 +227,18 @@ func installByArchive(version string) error {
 }
 
 func unpackArchive(f string) error {
-	cmd := exec.Command("tar", "-xzf", f, "--strip-components", "1")
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	log.Println("[exec]", cmd.String())
-	return cmd.Run()
+	log.Println("[unpack]", f)
+
+	if strings.HasSuffix(f, ".zip") {
+		z := &cmdutils.Zip{
+			StripComponents: 1,
+		}
+		return z.Unpack(f, "./")
+	}
+	tr := &cmdutils.Tar{
+		StripComponents: 1,
+	}
+	return tr.Unpack(f, "./")
 }
 
 func versionArchiveURL(version string) string {

@@ -5,6 +5,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"io/ioutil"
 	"log"
@@ -53,8 +54,7 @@ func Download() error {
 		return nil
 	}
 
-	repo := "https://github.com/golang/dl.git"
-
+	repo := getGolangDlRepo()
 	args := []string{"clone", repo, golangDLDir}
 	cmdClone := exec.Command("git", args...)
 	log.Println("[exec]", cmdClone.String())
@@ -62,8 +62,29 @@ func Download() error {
 	cmdClone.Stderr = os.Stderr
 	cmdClone.Stdout = os.Stdout
 	if err = cmdClone.Run(); err != nil {
+		// 若直接下载失败了，则使用内置的，将其解压到对应目录下去
+		log.Println("[failback] extract", defaultRepo, "by embed datas")
+		err2 := extractGolangDLTar(dlDir)
+		if err2 == nil {
+			return nil
+		}
 		return err
 	}
 	writeStats()
 	return nil
+}
+
+const defaultRepo = "https://github.com/golang/dl.git"
+
+func getGolangDlRepo() string {
+	fp := filepath.Join(TmpDir(), "golang_dl.txt")
+	txt, err := ioutil.ReadFile(fp)
+	if err != nil {
+		return defaultRepo
+	}
+	txt = bytes.TrimSpace(txt)
+	if len(txt) == 0 {
+		return defaultRepo
+	}
+	return string(txt)
 }

@@ -160,9 +160,21 @@ func LastVersions() (Versions, error) {
 	if err != nil {
 		return nil, err
 	}
-	versions := make(map[string][]*Version)
+	var vs []string
 	for _, name := range matches {
-		vv, err := parserVersion(filepath.Base(name))
+		vs = append(vs, filepath.Base(name))
+	}
+	return parserVersions(vs)
+}
+
+func parserVersions(vs []string) (Versions, error) {
+	versions := make(map[string][]*Version)
+	for _, name := range vs {
+		name = strings.TrimSpace(name)
+		if len(name) == 0 || name == "gotip" {
+			continue
+		}
+		vv, err := parserVersion(name)
 		if err != nil {
 			continue
 		}
