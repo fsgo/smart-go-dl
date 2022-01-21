@@ -26,6 +26,9 @@ func Prepare() error {
 		return err
 	}
 
+	loadConfig()
+	printProxy()
+
 	if err = chdir(tmpDir); err != nil {
 		return err
 	}

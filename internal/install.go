@@ -215,9 +215,7 @@ func installByArchive(version string) error {
 	}
 	u := versionArchiveURL(version)
 	out := u[strings.LastIndex(u, "/")+1:]
-	wget := &cmdutils.Wget{
-		PrintProgress: os.Stderr,
-	}
+	wget := newWget()
 	log.Println("[download] from", u, "to", out)
 	return wget.Download(u, out)
 	if err = unpackArchive(out); err != nil {
@@ -252,5 +250,6 @@ func versionArchiveURL(version string) string {
 	if goos == "linux" && runtime.GOARCH == "arm" {
 		arch = "armv6l"
 	}
-	return "https://dl.google.com/go/" + version + "." + goos + "-" + arch + ext
+	name := version + "." + goos + "-" + arch + ext
+	return defaultConfig.getTarUrL(name)
 }

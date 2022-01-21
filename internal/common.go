@@ -12,11 +12,13 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/fsgo/cmdutils"
 )
 
 var gTmpDir string
 
-// GetTmpDir 获取当前应用的缓存目录
+// GetTmpDir 获取当前应用的缓存目录, 路径为 ~/sdk/smart-go-dl
 func GetTmpDir() (string, error) {
 	if len(gTmpDir) != 0 {
 		return gTmpDir, nil
@@ -39,7 +41,7 @@ func chdir(dir string) error {
 	return err
 }
 
-// TmpDir 获取临时目录
+// TmpDir 获取临时目录，路径为 ~/sdk/smart-go-dl
 func TmpDir() string {
 	if len(gTmpDir) != 0 {
 		return gTmpDir
@@ -148,4 +150,11 @@ func copyFile(src, dst string) error {
 	defer df.Close()
 	_, err = io.Copy(df, sf)
 	return err
+}
+
+func newWget() *cmdutils.Wget {
+	return &cmdutils.Wget{
+		PrintProgress: os.Stderr,
+		Proxy:         defaultConfig.getProxy(),
+	}
 }
