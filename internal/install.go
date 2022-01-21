@@ -217,7 +217,10 @@ func installByArchive(version string) error {
 	out := u[strings.LastIndex(u, "/")+1:]
 	wget := newWget()
 	log.Println("[download] from", u, "to", out)
-	return wget.Download(u, out)
+	
+	if err= wget.Download(u, out);err!=nil{
+		return fmt.Errorf("download failed: %w",err)
+	}
 	if err = unpackArchive(out); err != nil {
 		return err
 	}
