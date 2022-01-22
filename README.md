@@ -125,11 +125,14 @@ smart-go-dl remove go1.17.3
 可选的配置文件为 `~/sdk/smart-go-dl/app.toml`:
 ```toml
 # 下载时使用的 Proxy，可选
+# 不配置或者为空时，会使用环境变量的代理配置
 # Proxy="http://127.0.0.1:8128"
 
 # 下载 Go tar 文件的地址前缀，可选
+# 默认值是 "https://dl.google.com/go/"
 #TarURLPrefix="https://dl.google.com/go/"
 ```
+该文件在不存在的时候，会尝试自动创建
 
 ## 数据/缓存目录
 该程序使用 `$HOME/sdk/smart-go-dl/` 目录缓存数据，依赖的 https://github.com/golang/dl 

@@ -5,10 +5,8 @@
 package internal
 
 import (
-	"bytes"
 	"context"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,13 +18,13 @@ const golangDLDir = "golang_dl"
 
 // Download 下载 golang/dl.git
 func Download() error {
-	dlStatsPath := filepath.Join(TmpDir(), dlStatsFile)
+	dlStatsPath := filepath.Join(DataDir(), dlStatsFile)
 	writeStats := func() {
 		_ = ioutil.WriteFile(dlStatsPath, []byte(time.Now().String()), 0655)
 	}
 	info, _ := os.Stat(dlStatsPath)
 
-	dlDir := filepath.Join(TmpDir(), golangDLDir)
+	dlDir := filepath.Join(DataDir(), golangDLDir)
 	_, err := os.Stat(dlDir)
 	if err == nil {
 		// 短期内更新过的
@@ -43,27 +41,27 @@ func Download() error {
 		defer cancel()
 
 		cmdPull := exec.CommandContext(ctx, "git", "pull", "-v")
-		log.Println("[exec]", cmdPull.String())
+		logPrint("exec", cmdPull.String())
 		cmdPull.Stderr = os.Stderr
 		cmdPull.Stdout = os.Stdout
 		if err = cmdPull.Run(); err != nil {
-			log.Println("skipped error: git pull failed, ", err)
+			logPrint("skipped", "git pull failed, ", err)
 			// 忽略异常,可能由于 Q 的存在，更新最新版本不是很稳定
 		}
 		writeStats()
 		return nil
 	}
 
-	repo := getGolangDlRepo()
+	repo := defaultRepo
 	args := []string{"clone", repo, golangDLDir}
 	cmdClone := exec.Command("git", args...)
-	log.Println("[exec]", cmdClone.String())
+	logPrint("exec", cmdClone.String())
 	cmdClone.Stdin = os.Stdin
 	cmdClone.Stderr = os.Stderr
 	cmdClone.Stdout = os.Stdout
 	if err = cmdClone.Run(); err != nil {
 		// 若直接下载失败了，则使用内置的，将其解压到对应目录下去
-		log.Println("[failback] extract", defaultRepo, "by embed datas")
+		logPrint("failback", "extract", defaultRepo, "by embed datas")
 		err2 := extractGolangDLTar(dlDir)
 		if err2 == nil {
 			return nil
@@ -75,16 +73,3 @@ func Download() error {
 }
 
 const defaultRepo = "https://github.com/golang/dl.git"
-
-func getGolangDlRepo() string {
-	fp := filepath.Join(TmpDir(), "golang_dl.txt")
-	txt, err := ioutil.ReadFile(fp)
-	if err != nil {
-		return defaultRepo
-	}
-	txt = bytes.TrimSpace(txt)
-	if len(txt) == 0 {
-		return defaultRepo
-	}
-	return string(txt)
-}

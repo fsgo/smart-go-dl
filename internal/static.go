@@ -19,7 +19,7 @@ var staticVersions Versions
 var golangDlTar []byte
 
 func extractGolangDLTar(dstDir string) error {
-	tarPath := filepath.Join(TmpDir(), "golang_dl.tar.gz")
+	tarPath := filepath.Join(DataDir(), "golang_dl.tar.gz")
 	defer os.Remove(tarPath)
 
 	if err := ioutil.WriteFile(tarPath, golangDlTar, 0644); err != nil {

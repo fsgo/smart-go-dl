@@ -6,7 +6,7 @@ package internal
 
 import (
 	"fmt"
-	"log"
+	"os"
 )
 
 // Update 更新 go 版本，version 支持多种格式
@@ -33,17 +33,18 @@ func updateAll() error {
 	var failed []string
 	for _, mv := range versions {
 		if mv.NormalizedVersion == "gotip" {
-			log.Println("[update] skip gotip")
+			logPrint("update", "skip gotip, you can update it by 'gotip download'")
+			fmt.Fprint(os.Stderr, "\n")
 			continue
 		}
 		if mv.Installed() {
 			if err = update(mv.NormalizedVersion); err != nil {
-				log.Println("[update]", mv.NormalizedVersion, "failed:", err)
+				logPrint("update", mv.NormalizedVersion, "failed:", err)
 				failed = append(failed, mv.NormalizedVersion)
 			} else {
-				log.Println("[update]", mv.NormalizedVersion, "success")
+				logPrint("update", mv.NormalizedVersion, "success")
 			}
-			log.Println()
+			fmt.Fprint(os.Stderr, "\n")
 		}
 	}
 	if len(failed) > 0 {

@@ -6,7 +6,6 @@ package internal
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 )
@@ -36,12 +35,13 @@ func remove(version string) error {
 	}
 
 	goBin := v.RawGoBinPath()
-	log.Println("[clean] remove ", goBin)
+
+	logPrint("remove", goBin)
 	if err = os.Remove(goBin); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	log.Println("[clean] remove ", sdkDir)
+	logPrint("remove", sdkDir)
 	if err = os.RemoveAll(sdkDir); err != nil && !os.IsNotExist(err) {
 		return err
 	}

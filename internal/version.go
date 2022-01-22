@@ -78,7 +78,7 @@ func (v *Version) Installed() bool {
 
 // DlDir 当前版本在缓存的 golang/dl 下的路径
 func (v *Version) DlDir() string {
-	return filepath.Join(TmpDir(), golangDLDir, v.Raw)
+	return filepath.Join(DataDir(), golangDLDir, v.Raw)
 }
 
 var versionReg = regexp.MustCompile(`^(go1\.\d+)((\.\d+)|(rc\d+)|(beta\d+))?$`)
@@ -155,7 +155,7 @@ func (vs Versions) Get(version string) *MinorVersion {
 
 // LastVersions 获取 golang/dl里所有的版本信息
 func LastVersions() (Versions, error) {
-	pt := filepath.Join(TmpDir(), golangDLDir, "go1.*")
+	pt := filepath.Join(DataDir(), golangDLDir, "go1.*")
 	matches, err := filepath.Glob(pt)
 	if err != nil {
 		return nil, err

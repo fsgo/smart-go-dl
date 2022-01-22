@@ -5,7 +5,7 @@
 package internal
 
 import (
-	"log"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -65,14 +65,16 @@ func (c *Config) getTarURLPrefix() string {
 var defaultConfig = &Config{}
 
 func loadConfig() {
-	fp := filepath.Join(TmpDir(), "app.toml")
+	fp := filepath.Join(DataDir(), "app.toml")
+	logPrint("config", fp)
 	content, err := os.ReadFile(fp)
 	if err != nil && os.IsNotExist(err) {
+		_ = ioutil.WriteFile(fp, []byte(cfgTpl), 0644)
 		return
 	}
 	var cfg *Config
 	if err = toml.Unmarshal(content, &cfg); err != nil {
-		log.Println("[ignore] parser", fp, "failed,", err)
+		logPrint("config", "ignored,parser", fp, "failed,", err)
 		return
 	}
 	defaultConfig = cfg
@@ -84,8 +86,22 @@ func printProxy() {
 	proxyFn := defaultConfig.getProxy()
 	pu, err := proxyFn(req)
 	if err != nil {
-		log.Println("[proxy] error:", err)
+		logPrint("proxy", "parser proxy failed:", err)
 	} else if pu != nil {
-		log.Println("[proxy]", pu.String())
+		logPrint("proxy", pu.String())
 	}
 }
+
+var cfgTpl = `
+# smart-go-dl
+# https://github.com/fsgo/smart-go-dl
+
+# 下载时使用的 Proxy，可选
+# 不配置或者为空时，会使用环境变量的代理配置
+# Proxy="http://127.0.0.1:8128"
+
+# 下载 Go tar 文件的地址前缀，可选
+# 默认值是 "https://dl.google.com/go/"
+#TarURLPrefix="https://dl.google.com/go/"
+
+`

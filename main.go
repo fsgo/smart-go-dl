@@ -51,7 +51,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.3
-Date    : 2022-01-21
+Date    : 2022-01-22
 `
 
 func init() {
@@ -96,7 +96,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatalf("%s error: %v\n", args[1], err)
+		log.Fatalf("error: %s failed, %v\n", args[1], err)
 	} else {
 		log.Printf("%s success", args[1])
 	}

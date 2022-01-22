@@ -5,13 +5,12 @@
 package internal
 
 import (
-	"log"
 	"os"
 )
 
 // Prepare 在其他正式命令之前的预处理逻辑
 func Prepare() error {
-	tmpDir, err := GetTmpDir()
+	dataDir, err := GetDataDir()
 	if err != nil {
 		return err
 	}
@@ -20,16 +19,16 @@ func Prepare() error {
 		return err
 	}
 
-	log.Println("Use TmpDir:", tmpDir)
+	logPrint("data_dir", dataDir)
 
-	if err = os.MkdirAll(tmpDir, 0777); err != nil && !os.IsExist(err) {
+	if err = os.MkdirAll(dataDir, 0777); err != nil && !os.IsExist(err) {
 		return err
 	}
 
 	loadConfig()
 	printProxy()
 
-	if err = chdir(tmpDir); err != nil {
+	if err = chdir(dataDir); err != nil {
 		return err
 	}
 	return Download()

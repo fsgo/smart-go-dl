@@ -18,8 +18,8 @@ import (
 
 var gTmpDir string
 
-// GetTmpDir 获取当前应用的缓存目录, 路径为 ~/sdk/smart-go-dl
-func GetTmpDir() (string, error) {
+// GetDataDir 获取当前应用的缓存目录, 路径为 ~/sdk/smart-go-dl
+func GetDataDir() (string, error) {
 	if len(gTmpDir) != 0 {
 		return gTmpDir, nil
 	}
@@ -34,19 +34,19 @@ func GetTmpDir() (string, error) {
 func chdir(dir string) error {
 	err := os.Chdir(dir)
 	if err == nil {
-		log.Println("[chdir]", dir)
+		logPrint("chdir", dir)
 	} else {
-		log.Println("[chdir]", dir, "failed:", err)
+		logPrint("chdir", dir, "failed:", err)
 	}
 	return err
 }
 
-// TmpDir 获取临时目录，路径为 ~/sdk/smart-go-dl
-func TmpDir() string {
+// DataDir 获取临时目录，路径为 ~/sdk/smart-go-dl
+func DataDir() string {
 	if len(gTmpDir) != 0 {
 		return gTmpDir
 	}
-	t, err := GetTmpDir()
+	t, err := GetDataDir()
 	if err != nil {
 		panic(err)
 	}
@@ -157,4 +157,16 @@ func newWget() *cmdutils.Wget {
 		PrintProgress: os.Stderr,
 		Proxy:         defaultConfig.getProxy(),
 	}
+}
+
+func logPrint(key string, msgs ...interface{}) {
+	ks := fmt.Sprintf("%-10s : ", key)
+	var bs strings.Builder
+	bs.WriteString(ks)
+	bs.WriteString(" ")
+	for _, m := range msgs {
+		bs.WriteString(fmt.Sprint(m))
+		bs.WriteString(" ")
+	}
+	log.Output(1, bs.String())
 }

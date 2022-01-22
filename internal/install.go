@@ -36,7 +36,7 @@ func Install(version string) error {
 	}
 	last := mv.Latest()
 
-	log.Printf("[install] found %s's latest version is %s\n", version, last.Raw)
+	logPrint("install", fmt.Sprintf("found %s's latest version is %s", version, last.Raw))
 
 	goBinTo := last.RawGoBinPath()
 
@@ -64,7 +64,7 @@ func Install(version string) error {
 				return err
 			}
 		}
-		log.Println("[link]", goBinTo, "->", goBinLink, "success")
+		logPrint("link", goBinTo, "->", goBinLink, "success")
 	}
 
 	// create sdk dir link
@@ -79,7 +79,7 @@ func Install(version string) error {
 		if err = os.Symlink(sdkDir, sdkDirLink); err != nil {
 			return err
 		}
-		log.Println("[link]", mustGoRoot(last.Raw), "->", sdkDirLink, "success")
+		logPrint("link", mustGoRoot(last.Raw), "->", sdkDirLink, "success")
 	}
 	log.Printf("Success. You may now run '%s'\n", version)
 	return nil
@@ -109,7 +109,7 @@ func installWithVersion(ver *Version) error {
 	goBinTo := ver.RawGoBinPath()
 
 	cmd := exec.CommandContext(ctx, gb, "build", "-o", goBinTo)
-	log.Println("[exec]", cmd.String())
+	logPrint("exec", cmd.String())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	if err = cmd.Run(); err != nil {
@@ -117,7 +117,7 @@ func installWithVersion(ver *Version) error {
 	}
 
 	downloadCmd := exec.Command(goBinTo, "download")
-	log.Println("[exec]", downloadCmd.String())
+	logPrint("exec", downloadCmd.String())
 	downloadCmd.Stderr = os.Stderr
 	downloadCmd.Stdout = os.Stdout
 	err = downloadCmd.Run()
@@ -133,13 +133,13 @@ func removeGoTmpTar(version string) {
 	if err != nil {
 		return
 	}
-	tmpTar := filepath.Join(sdk, version, version+"."+runtime.GOOS+"-"+runtime.GOARCH+".tar.gz")
+	name := versionArchiveName(version)
+	tmpTar := filepath.Join(sdk, version, name)
 	_, err = os.Stat(tmpTar)
 	if err == nil {
-		log.Println("[remove]", tmpTar)
+		logPrint("remove", tmpTar)
 		_ = os.Remove(tmpTar)
 	}
-
 }
 
 // installVV 安装指定的小版本
@@ -216,10 +216,10 @@ func installByArchive(version string) error {
 	u := versionArchiveURL(version)
 	out := u[strings.LastIndex(u, "/")+1:]
 	wget := newWget()
-	log.Println("[download] from", u, "to", out)
-	
-	if err= wget.Download(u, out);err!=nil{
-		return fmt.Errorf("download failed: %w",err)
+	logPrint("download", "from", u, "to", out)
+
+	if err = wget.Download(u, out); err != nil {
+		return fmt.Errorf("download failed: %w", err)
 	}
 	if err = unpackArchive(out); err != nil {
 		return err
@@ -228,7 +228,7 @@ func installByArchive(version string) error {
 }
 
 func unpackArchive(f string) error {
-	log.Println("[unpack]", f)
+	logPrint("unpack", f)
 
 	if strings.HasSuffix(f, ".zip") {
 		z := &cmdutils.Zip{
@@ -242,7 +242,7 @@ func unpackArchive(f string) error {
 	return tr.Unpack(f, "./")
 }
 
-func versionArchiveURL(version string) string {
+func versionArchiveName(version string) string {
 	goos := getOS()
 
 	ext := ".tar.gz"
@@ -254,5 +254,10 @@ func versionArchiveURL(version string) string {
 		arch = "armv6l"
 	}
 	name := version + "." + goos + "-" + arch + ext
+	return name
+}
+
+func versionArchiveURL(version string) string {
+	name := versionArchiveName(version)
 	return defaultConfig.getTarUrL(name)
 }
