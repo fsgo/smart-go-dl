@@ -100,13 +100,17 @@ func installWithVersion(ver *Version) error {
 		return err
 	}
 
+	goBinTo := ver.RawGoBinPath()
+
+	if _, err = exec.LookPath(goBinTo); err != nil {
+		err = installByArchive(ver.Raw)
+	}
+
 	if err = chdir(ver.DlDir()); err != nil {
 		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-
-	goBinTo := ver.RawGoBinPath()
 
 	cmd := exec.CommandContext(ctx, gb, "build", "-o", goBinTo)
 	logPrint("exec", cmd.String())
@@ -202,6 +206,7 @@ func findGoInSdkDir() string {
 	return ""
 }
 
+// installByArchive 安装指定的 3 位版本
 func installByArchive(version string) error {
 	gr, err := goroot(version)
 	if err != nil {

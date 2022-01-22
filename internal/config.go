@@ -77,6 +77,8 @@ func loadConfig() {
 		logPrint("config", "ignored,parser", fp, "failed,", err)
 		return
 	}
+	cfg.Proxy = strings.TrimSpace(cfg.Proxy)
+	cfg.TarURLPrefix = strings.TrimSpace(cfg.TarURLPrefix)
 	defaultConfig = cfg
 	cfg.trySetProxyEnv()
 }

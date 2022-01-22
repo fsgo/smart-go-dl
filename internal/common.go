@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/fsgo/cmdutils"
 )
@@ -154,8 +155,9 @@ func copyFile(src, dst string) error {
 
 func newWget() *cmdutils.Wget {
 	return &cmdutils.Wget{
-		PrintProgress: os.Stderr,
-		Proxy:         defaultConfig.getProxy(),
+		LogWriter:      os.Stderr,
+		Proxy:          defaultConfig.getProxy(),
+		ConnectTimeout: 30 * time.Second,
 	}
 }
 
