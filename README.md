@@ -128,6 +128,9 @@ smart-go-dl remove go1.17.3
 # 不配置或者为空时，会使用环境变量的代理配置
 # Proxy="http://127.0.0.1:8128"
 
+# 下载文件时，是否跳过证书校验，可选，默认 false
+# InsecureSkipVerify = true
+
 # 下载 Go tar 文件的地址前缀，可选
 # 默认值是 "https://dl.google.com/go/"
 #TarURLPrefix="https://dl.google.com/go/"

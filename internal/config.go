@@ -23,6 +23,9 @@ type Config struct {
 	// TarURLPrefix 下载 go 打包文件的 url 地址前缀，可选
 	// 为空时使用默认值 "https://dl.google.com/go/"
 	TarURLPrefix string
+
+	// InsecureSkipVerify 是否跳过证书校验
+	InsecureSkipVerify bool
 }
 
 func (c *Config) getProxy() func(*http.Request) (*url.URL, error) {
@@ -60,6 +63,10 @@ func (c *Config) getTarURLPrefix() string {
 		return c.TarURLPrefix
 	}
 	return tarURLPrefixDefault
+}
+
+func (c *Config) isDefaultRarURLPrefix() bool {
+	return strings.Contains(c.getTarURLPrefix(), "dl.google.com")
 }
 
 var defaultConfig = &Config{}
@@ -101,6 +108,9 @@ var cfgTpl = `
 # 下载时使用的 Proxy，可选
 # 不配置或者为空时，会使用环境变量的代理配置
 # Proxy="http://127.0.0.1:8128"
+
+# 下载文件时，是否跳过证书校验，可选，默认 false
+# InsecureSkipVerify = true
 
 # 下载 Go tar 文件的地址前缀，可选
 # 默认值是 "https://dl.google.com/go/"
