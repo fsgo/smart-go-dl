@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -69,11 +70,9 @@ func (v *Version) Installed() bool {
 	if err != nil || (err == nil && !info.IsDir()) {
 		return false
 	}
-	_, err = os.Readlink(sdk)
-	if err != nil {
-		return true
-	}
-	return false
+	gb := filepath.Join(sdk, "bin", "go"+exe())
+	_, err = exec.LookPath(gb)
+	return err == nil
 }
 
 // DlDir 当前版本在缓存的 golang/dl 下的路径

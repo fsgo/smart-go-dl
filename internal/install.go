@@ -7,6 +7,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -232,8 +233,16 @@ func installByArchive(version string) error {
 	return nil
 }
 
-func unpackArchive(f string) error {
+const unpackedOkay = ".unpacked-success"
+
+func unpackArchive(f string) (err error) {
 	logPrint("unpack", f)
+	defer func() {
+		if err != nil {
+			return
+		}
+		_ = ioutil.WriteFile(unpackedOkay, nil, 0644)
+	}()
 
 	if strings.HasSuffix(f, ".zip") {
 		z := &cmdutils.Zip{

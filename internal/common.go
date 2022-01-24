@@ -155,9 +155,10 @@ func copyFile(src, dst string) error {
 
 func newWget() *cmdutils.Wget {
 	gt := &cmdutils.Wget{
-		LogWriter:      os.Stderr,
-		Proxy:          defaultConfig.getProxy(),
-		ConnectTimeout: 30 * time.Second,
+		LogWriter:          os.Stderr,
+		Proxy:              defaultConfig.getProxy(),
+		ConnectTimeout:     30 * time.Second,
+		InsecureSkipVerify: defaultConfig.InsecureSkipVerify,
 	}
 	// 只有使用默认的下载地址的时候，才需要代理
 	if !defaultConfig.isDefaultRarURLPrefix() {
