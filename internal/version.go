@@ -21,7 +21,7 @@ type Version struct {
 	// 原始的版本号，如 go1.10，go1.9rc2，go1.18beta1
 	Raw string
 
-	// 归一化的值，
+	// 归一化的值，值越大表示版本越新
 	Num int
 
 	// 归一化的，如 go1.17
@@ -99,14 +99,14 @@ func parserVersion(version string) (*Version, error) {
 	num, _ := strconv.Atoi(matches[1][4:])
 	num = num * 10000
 
-	if strings.HasPrefix(matches[2], "rc") {
-		m, _ := strconv.Atoi(matches[2][2:])
+	if strings.HasPrefix(matches[2], "beta") {
+		m, _ := strconv.Atoi(matches[2][4:])
 		num += m
 	}
 
-	if strings.HasPrefix(matches[2], "beta") {
-		m, _ := strconv.Atoi(matches[2][4:])
-		num += m * 100
+	if strings.HasPrefix(matches[2], "rc") {
+		m, _ := strconv.Atoi(matches[2][2:])
+		num += m * 10
 	}
 
 	if strings.HasPrefix(matches[2], ".") {
