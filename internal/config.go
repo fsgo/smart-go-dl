@@ -15,6 +15,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// Config 当前程序的配置
 type Config struct {
 	// Proxy 代理服务器地址，可选
 	// 若为空，会使用环境变量中的 Proxy 配置

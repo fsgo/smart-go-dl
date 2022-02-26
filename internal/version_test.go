@@ -52,6 +52,24 @@ func Test_parserVersion(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			version: "go1.10beta1",
+			want: &Version{
+				Raw:        "go1.10beta1",
+				Num:        100001,
+				Normalized: "go1.10",
+			},
+			wantErr: false,
+		},
+		{
+			version: "go1.10rc1",
+			want: &Version{
+				Raw:        "go1.10rc1",
+				Num:        100010,
+				Normalized: "go1.10",
+			},
+			wantErr: false,
+		},
+		{
 			version: "go1.10",
 			want: &Version{
 				Raw:        "go1.10",
@@ -65,24 +83,6 @@ func Test_parserVersion(t *testing.T) {
 			want: &Version{
 				Raw:        "go1.10.1",
 				Num:        101000,
-				Normalized: "go1.10",
-			},
-			wantErr: false,
-		},
-		{
-			version: "go1.10rc1",
-			want: &Version{
-				Raw:        "go1.10rc1",
-				Num:        100001,
-				Normalized: "go1.10",
-			},
-			wantErr: false,
-		},
-		{
-			version: "go1.10beta1",
-			want: &Version{
-				Raw:        "go1.10beta1",
-				Num:        100100,
 				Normalized: "go1.10",
 			},
 			wantErr: false,
