@@ -5,6 +5,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -121,15 +122,15 @@ func installWithVersion(ver *Version) error {
 		return err
 	}
 
-	downloadCmd := exec.Command(goBinTo, "download")
-	logPrint("exec", downloadCmd.String())
-	downloadCmd.Stderr = os.Stderr
-	downloadCmd.Stdout = os.Stdout
-	err = downloadCmd.Run()
-	if err == nil {
-		removeGoTmpTar(ver.Raw)
-		log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
-	}
+	// downloadCmd := exec.Command(goBinTo, "download")
+	// logPrint("exec", downloadCmd.String())
+	// downloadCmd.Stderr = os.Stderr
+	// downloadCmd.Stdout = os.Stdout
+	// err = downloadCmd.Run()
+	// if err == nil {
+	removeGoTmpTar(ver.Raw)
+	log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
+	// }
 	return err
 }
 
@@ -176,7 +177,7 @@ func installVV(version string, vvs Versions) error {
 
 func findGoBin() (string, error) {
 	gb := "go" + exe()
-	if p, err := exec.LookPath(gb); err == nil {
+	if p, err := lookGoBinPath(gb); err == nil {
 		return p, nil
 	}
 	if ep := findGoInSdkDir(); len(ep) > 0 {
@@ -184,6 +185,27 @@ func findGoBin() (string, error) {
 	}
 
 	return gb, fmt.Errorf("cannot find %q in $PATH", gb)
+}
+
+// lookGoBinPath 查找判断是否一个有效的 go bin
+func lookGoBinPath(goFile string) (string, error) {
+	gb, err := exec.LookPath(goFile)
+	if err != nil {
+		return "", err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	out, err := exec.CommandContext(ctx, gb, "version").Output()
+	if err != nil {
+		return "", err
+	}
+
+	// 完整的 out : go version go1.16.15 darwin/amd64
+	if bytes.HasPrefix(out, []byte("go version go")) {
+		return gb, nil
+	}
+	return "", fmt.Errorf("%s is not valid go bin", goFile)
 }
 
 // 查找 ~/sdk/ 目录下已经安装的 go 版本
@@ -200,7 +222,7 @@ func findGoInSdkDir() string {
 		return strings.Compare(ms[i], ms[j]) >= 0
 	})
 	for _, m := range ms {
-		if ep, err := exec.LookPath(filepath.Join(m, "bin", "go"+exe())); err == nil {
+		if ep, err := lookGoBinPath(filepath.Join(m, "bin", "go"+exe())); err == nil {
 			return ep
 		}
 	}

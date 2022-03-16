@@ -125,7 +125,7 @@ func colorText(txt string, color int) string {
 func sdkRoot() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %v", err)
+		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 	return filepath.Join(home, "sdk"), nil
 }
@@ -176,5 +176,5 @@ func logPrint(key string, msgs ...interface{}) {
 		bs.WriteString(fmt.Sprint(m))
 		bs.WriteString(" ")
 	}
-	log.Output(1, bs.String())
+	_ = log.Output(1, bs.String())
 }

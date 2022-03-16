@@ -21,9 +21,7 @@ func remove(version string) error {
 		return err
 	}
 
-	if strings.HasSuffix(version, ".0") {
-		version = version[0 : len(version)-2]
-	}
+	version = strings.TrimSuffix(version, ".0")
 
 	sdkDir, err := goroot(version)
 	if err != nil {

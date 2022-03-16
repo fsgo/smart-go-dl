@@ -7,6 +7,8 @@ package internal
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_versionReg(t *testing.T) {
@@ -46,7 +48,7 @@ func Test_parserVersion(t *testing.T) {
 			version: "go1.1",
 			want: &Version{
 				Raw:        "go1.1",
-				Num:        10000,
+				Num:        11000,
 				Normalized: "go1.1",
 			},
 			wantErr: false,
@@ -73,7 +75,7 @@ func Test_parserVersion(t *testing.T) {
 			version: "go1.10",
 			want: &Version{
 				Raw:        "go1.10",
-				Num:        100000,
+				Num:        101000,
 				Normalized: "go1.10",
 			},
 			wantErr: false,
@@ -82,7 +84,7 @@ func Test_parserVersion(t *testing.T) {
 			version: "go1.10.1",
 			want: &Version{
 				Raw:        "go1.10.1",
-				Num:        101000,
+				Num:        102000,
 				Normalized: "go1.10",
 			},
 			wantErr: false,
@@ -96,8 +98,28 @@ func Test_parserVersion(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("parserVersion() got = %v, want %v", got, tt.want)
+				t.Errorf("parserVersion()\n  got = %#v,\n want = %#v", got, tt.want)
 			}
 		})
 	}
+}
+
+func Test_parserVersions(t *testing.T) {
+	versions := []string{
+		"go1.1",
+		"go1.10", "go1.10.1", "go1.10.11",
+		"go1.7beta2", "go1.7rc1",
+		"go1.9beta2", "go1.9rc1", "go1.9rc2", "go1.9",
+		"go1.8beta1",
+		"go1.18beta2", "go1.18rc1", "go1.18", "go1.18.1",
+		"gotip",
+	}
+	vs, err := parserVersions(versions)
+	require.NoError(t, err)
+	var got []string
+	for _, item := range vs {
+		got = append(got, item.Latest().Raw)
+	}
+	want := []string{"gotip", "go1.18.1", "go1.10.11", "go1.9", "go1.8beta1", "go1.7rc1", "go1.1"}
+	require.Equal(t, want, got)
 }

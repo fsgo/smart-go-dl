@@ -50,8 +50,8 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@main
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.4
-Date    : 2022-02-23
+Version : 0.1.5
+Date    : 2022-03-16
 `
 
 func init() {

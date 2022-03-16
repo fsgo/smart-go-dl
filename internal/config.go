@@ -21,6 +21,10 @@ type Config struct {
 	// 若为空，会使用环境变量中的 Proxy 配置
 	Proxy string
 
+	// GoProxy 可选
+	// 若为空 会读取 go env GOPROXY 的值
+	GoProxy string
+
 	// TarURLPrefix 下载 go 打包文件的 url 地址前缀，可选
 	// 为空时使用默认值 "https://dl.google.com/go/"
 	TarURLPrefix string

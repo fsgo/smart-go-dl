@@ -85,12 +85,22 @@ var versionReg = regexp.MustCompile(`^(go1\.\d+)((\.\d+)|(rc\d+)|(beta\d+))?$`)
 func parserVersion(version string) (*Version, error) {
 	matches := versionReg.FindStringSubmatch(version)
 	if len(matches) == 0 {
-		return nil, fmt.Errorf("not goBinPath version")
+		return nil, fmt.Errorf("not go version: %s", version)
 	}
-	// "go1.1rc1"   -> ["go1.1rc1" "go1.1" "rc1" "" "rc1" ""]
-	// "go1.12.12"  -> ["go1.12.12" "go1.12" ".12" ".12" "" ""]
-	// "go1.12"     -> ["go1.12" "go1.12" "" "" "" ""]
-	// "go1.1beta1" -> ["go1.1beta1" "go1.1" "beta1" "" "" "beta1"]
+	// fmt.Printf("%-10s\t-> %#v\n", version, matches)
+
+	// go1.1     	-> []string{"go1.1", "go1.1", "", "", "", ""}
+	// go1.10    	-> []string{"go1.10", "go1.10", "", "", "", ""}
+	// go1.10.1  	-> []string{"go1.10.1", "go1.10", ".1", ".1", "", ""}
+	// go1.10.11 	-> []string{"go1.10.11", "go1.10", ".11", ".11", "", ""}
+	// go1.9rc1  	-> []string{"go1.9rc1", "go1.9", "rc1", "", "rc1", ""}
+	// go1.9rc2  	-> []string{"go1.9rc2", "go1.9", "rc2", "", "rc2", ""}
+	// go1.9     	-> []string{"go1.9", "go1.9", "", "", "", ""}
+	// go1.8beta1	-> []string{"go1.8beta1", "go1.8", "beta1", "", "", "beta1"}
+	// go1.18beta2	-> []string{"go1.18beta2", "go1.18", "beta2", "", "", "beta2"}
+	// go1.18rc1 	-> []string{"go1.18rc1", "go1.18", "rc1", "", "rc1", ""}
+	// go1.18    	-> []string{"go1.18", "go1.18", "", "", "", ""}
+	// go1.18.1  	-> []string{"go1.18.1", "go1.18", ".1", ".1", "", ""}
 
 	vv := &Version{
 		Raw:        version,
@@ -99,19 +109,28 @@ func parserVersion(version string) (*Version, error) {
 	num, _ := strconv.Atoi(matches[1][4:])
 	num = num * 10000
 
+	// go1.18beta2
 	if strings.HasPrefix(matches[2], "beta") {
 		m, _ := strconv.Atoi(matches[2][4:])
 		num += m
 	}
 
+	// go1.18rc2
 	if strings.HasPrefix(matches[2], "rc") {
 		m, _ := strconv.Atoi(matches[2][2:])
 		num += m * 10
 	}
 
+	// 正式版本：go1.18
+	if matches[2] == "" {
+		num += 1000
+	}
+
+	// 正式修订版本：go1.18.1
 	if strings.HasPrefix(matches[2], ".") {
 		m, _ := strconv.Atoi(matches[2][1:])
-		num += m * 1000
+		// 比如 go1.18.1，实际是第二个正式版本，所以需要在修订号"1"的基础上 +1
+		num += (m + 1) * 1000
 	}
 	vv.Num = num
 	return vv, nil
@@ -166,6 +185,7 @@ func LastVersions() (Versions, error) {
 	return parserVersions(vs)
 }
 
+// parserVersions 解析版本号列表，并按照倒序输出
 func parserVersions(vs []string) (Versions, error) {
 	versions := make(map[string][]*Version)
 	for _, name := range vs {

@@ -19,10 +19,10 @@ func Update(version string) error {
 }
 
 func update(version string) error {
-	if err := Clean(version); err != nil {
+	if err := Install(version); err != nil {
 		return err
 	}
-	return Install(version)
+	return Clean(version)
 }
 
 func updateAll() error {
