@@ -61,7 +61,7 @@ func Download() error {
 	cmdClone.Stdout = os.Stdout
 	if err = cmdClone.Run(); err != nil {
 		// 若直接下载失败了，则使用内置的，将其解压到对应目录下去
-		logPrint("failback", "extract", defaultRepo, "by embed datas")
+		logPrint("fallback", "extract", defaultRepo, "by embed datas")
 		err2 := extractGolangDLTar(dlDir)
 		if err2 == nil {
 			return nil

@@ -104,9 +104,9 @@ func installWithVersion(ver *Version) error {
 
 	goBinTo := ver.RawGoBinPath()
 
-	if _, err = exec.LookPath(goBinTo); err != nil {
-		err = installByArchive(ver.Raw)
-	}
+	// if _, err = exec.LookPath(goBinTo); err != nil {
+	// 	err = installByArchive(ver.Raw)
+	// }
 
 	if err = chdir(ver.DlDir()); err != nil {
 		return err
@@ -115,23 +115,41 @@ func installWithVersion(ver *Version) error {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, gb, "build", "-o", goBinTo)
+	setGoEnv(cmd, gb)
 	logPrint("exec", cmd.String())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	if err = cmd.Run(); err != nil {
+		printGoEnv(gb)
 		return err
 	}
 
-	// downloadCmd := exec.Command(goBinTo, "download")
-	// logPrint("exec", downloadCmd.String())
-	// downloadCmd.Stderr = os.Stderr
-	// downloadCmd.Stdout = os.Stdout
-	// err = downloadCmd.Run()
-	// if err == nil {
 	removeGoTmpTar(ver.Raw)
 	log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
-	// }
 	return err
+}
+
+func printGoEnv(gb string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, gb, "env")
+	setGoEnv(cmd, gb)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	_ = cmd.Run()
+}
+
+func setGoEnv(cmd *exec.Cmd, gb string) {
+	goROOT := filepath.Dir(filepath.Dir(gb))
+	fp := filepath.Join(goROOT, "api", "go1.1.txt")
+	_, err := os.Stat(fp)
+	if err != nil {
+		return
+	}
+	cmd.Env = append(cmd.Env,
+		"GOROOT="+goROOT,
+		"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
+	)
 }
 
 func removeGoTmpTar(version string) {
