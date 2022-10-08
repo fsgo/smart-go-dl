@@ -84,7 +84,18 @@ func Install(version string) error {
 		logPrint("link", mustGoRoot(last.Raw), "->", sdkDirLink, "success")
 	}
 	log.Printf("Success. You may now run '%s'\n", version)
+	printPATHMessage(goBinTo)
 	return nil
+}
+
+func printPATHMessage(goBinTo string) {
+	name := filepath.Base(goBinTo)
+	_, err := exec.LookPath(name)
+	if err == nil {
+		return
+	}
+	dir := filepath.Dir(goBinTo)
+	log.Printf("%q not in $PATH", dir)
 }
 
 func installWithVersion(ver *Version) error {
@@ -149,6 +160,7 @@ func setGoEnv(cmd *exec.Cmd, gb string) {
 	cmd.Env = append(cmd.Env,
 		"GOROOT="+goROOT,
 		"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
+		"GOBIN="+GOBIN(),
 	)
 }
 

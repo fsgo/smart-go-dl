@@ -60,7 +60,12 @@ var goBinPath string
 func ParserGOBIN() error {
 	paths := getEnvSlice("GOBIN")
 	if len(paths) == 0 || len(paths[0]) == 0 {
-		return fmt.Errorf("GOBIN has not setted")
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		goBinPath = filepath.Join(home, "go", "bin")
+		return nil
 	}
 	goBinPath = paths[0]
 	return nil
@@ -114,6 +119,7 @@ func mustGoRoot(version string) string {
 func green(txt string) string {
 	return colorText(txt, 32)
 }
+
 func yellow(txt string) string {
 	return colorText(txt, 33)
 }

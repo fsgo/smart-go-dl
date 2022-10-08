@@ -1,9 +1,9 @@
 module github.com/fsgo/smart-go-dl
 
-go 1.17
+go 1.19
 
 require (
-	github.com/BurntSushi/toml v1.0.0
+	github.com/BurntSushi/toml v1.2.0
 	github.com/fsgo/cmdutils v0.0.0-20220123161440-4f011c550e3c
 	github.com/stretchr/testify v1.7.1
 )
