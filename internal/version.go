@@ -122,7 +122,7 @@ func parserVersion(version string) (*Version, error) {
 	}
 
 	// 正式版本：go1.18
-	if matches[2] == "" {
+	if len(matches[2]) == 0 {
 		num += 1000
 	}
 

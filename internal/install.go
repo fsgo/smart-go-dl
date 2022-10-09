@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -293,7 +292,7 @@ func unpackArchive(f string) (err error) {
 		if err != nil {
 			return
 		}
-		_ = ioutil.WriteFile(unpackedOkay, nil, 0644)
+		_ = os.WriteFile(unpackedOkay, nil, 0644)
 	}()
 
 	if strings.HasSuffix(f, ".zip") {

@@ -5,7 +5,6 @@
 package internal
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -25,7 +24,7 @@ func Lock(version string, action string) error {
 		}
 		return nil
 	}
-	return ioutil.WriteFile(name, []byte("clean locked"), 0655)
+	return os.WriteFile(name, []byte("clean locked"), 0655)
 }
 
 func isLocked(version string) bool {

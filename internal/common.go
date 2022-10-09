@@ -173,7 +173,7 @@ func newWget() *cmdutils.Wget {
 	return gt
 }
 
-func logPrint(key string, msgs ...interface{}) {
+func logPrint(key string, msgs ...any) {
 	ks := fmt.Sprintf("%-10s : ", key)
 	var bs strings.Builder
 	bs.WriteString(ks)

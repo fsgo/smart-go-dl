@@ -6,7 +6,6 @@ package internal
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,7 +19,7 @@ const golangDLDir = "golang_dl"
 func Download() error {
 	dlStatsPath := filepath.Join(DataDir(), dlStatsFile)
 	writeStats := func() {
-		_ = ioutil.WriteFile(dlStatsPath, []byte(time.Now().String()), 0655)
+		_ = os.WriteFile(dlStatsPath, []byte(time.Now().String()), 0655)
 	}
 	info, _ := os.Stat(dlStatsPath)
 

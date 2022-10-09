@@ -6,7 +6,6 @@ package internal
 
 import (
 	_ "embed" // embed file for go version list
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -22,7 +21,7 @@ func extractGolangDLTar(dstDir string) error {
 	tarPath := filepath.Join(DataDir(), "golang_dl.tar.gz")
 	defer os.Remove(tarPath)
 
-	if err := ioutil.WriteFile(tarPath, golangDlTar, 0644); err != nil {
+	if err := os.WriteFile(tarPath, golangDlTar, 0644); err != nil {
 		return err
 	}
 	tr := &cmdutils.Tar{

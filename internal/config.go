@@ -5,7 +5,6 @@
 package internal
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -81,7 +80,7 @@ func loadConfig() {
 	logPrint("config", fp)
 	content, err := os.ReadFile(fp)
 	if err != nil && os.IsNotExist(err) {
-		_ = ioutil.WriteFile(fp, []byte(cfgTpl), 0644)
+		_ = os.WriteFile(fp, []byte(cfgTpl), 0644)
 		return
 	}
 	var cfg *Config
