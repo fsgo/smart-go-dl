@@ -30,58 +30,59 @@ smart-go-dl -help
 ```
 
 ## 安装 Go SDK
-### 安装最新的 `go1.18`：
+### 安装最新的 `go1.19`：
 ```bash
-smart-go-dl install go1.18
+smart-go-dl install go1.19
 ```
-会自动找到`go1.18` 最新的版本进行安装，并安装为 `$GOBIN/go1.18beta1` 和 `$GOBIN/go1.18`。  
-如当前 go1.18 的最新版本是 `go1.18beta1`，则上述 `$GOBIN/go1.18` 是 `$GOBIN/go1.18beta1` 的软连接。
+会自动找到`go1.19` 最新的版本进行安装，并安装为 `$GOBIN/go1.19.2` 和 `$GOBIN/go1.19`。  
+如当前 go1.19 的最新版本是 `go1.19.2`，则上述 `$GOBIN/go1.19` 是 `$GOBIN/go1.19.2` 的软连接。
 
-在使用的时候，可以直接使用 `go1.18` 或者 `go1.18beta1`：
+在使用的时候，可以直接使用 `go1.19` 或者 `go1.19.2`：
 ```bash
-go1.18 version           # 使用的总是 go1.18 系列的最新版本
-# go1.18beta1 version    # 使用的是 指定的小版本
+# go1.19 version
+或者
+# go1.19.2 version
 ```
 输出：
 ```
-# go version go1.18beta1 darwin/amd64
+go version go1.19.2 darwin/amd64
 ```
 
-以后有新的版本了，重新使用 `smart-go-dl install/update go1.18` 即可安装最新版本。
+以后有新的版本了，重新使用 `smart-go-dl install/update go1.19` 即可安装最新版本。
 
 使用其他版本示例：
 ```
-go1.18.0 version       # 使用首个正式版本，对应版本号为 go1.18
-go1.18.1 version       # 使用第 1 个正式修正版本,对应版本号为 go1.18.1
-go1.18.2 version       # 使用第 2 个正式修正版本,对应版本号为 go1.18.2
+go1.19.0 version       # 使用首个正式版本，对应版本号为 go1.19
+go1.19.1 version       # 使用第 1 个正式修正版本,对应版本号为 go1.19.1
+go1.19.2 version       # 使用第 2 个正式修正版本,对应版本号为 go1.19.2
 ```
 ### 安装指定的 3 位版本：
 ```bash
-smart-go-dl install go1.17.3
+smart-go-dl install go1.19.1
 ```
 ### 安装首个正式版本
-Go 的每个正式版本是如 `go1.17` 这种，3 位版本号 0 是缺省的，若要安装，可以这样：
+Go 的每个正式版本是如 `go1.19` 这种，3 位版本号 0 是缺省的，若要安装，可以这样：
 ```bash
-smart-go-dl install go1.17.0
+smart-go-dl install go1.19.0
 ```
-之后这样使用，如 `go1.17.0 version` 。
+之后这样使用，如 `go1.19.0 version` 。
 
 
 ## 清理过期的 Go SDK
-将 `go1.17` 除了最新版本的老版本清理掉：
+将 `go1.19` 除了最新版本的老版本清理掉：
 ```bash
-smart-go-dl clean go1.17
+smart-go-dl clean go1.19
 ```
 
-若期望指定版本不被清理，可以使用子命令 `lock`，如下为让 `go1.17.3`这个版本不被清理：
+若期望指定版本不被清理，可以使用子命令 `lock`，如下为让 `go1.19.1`这个版本不被清理：
 ```bash
-smart-go-dl lock go1.17.3
+smart-go-dl lock go1.19.1
 ```
 于此对应的有 `unlock` 命令，用于解除 lock 状态。
 
 ## 更新 Go SDK
 ```bash
-smart-go-dl update go1.17
+smart-go-dl update go1.19
 ```
 等价于先执行 clean，再执行 install。  
 还可以使用`smart-go-dl update` 来更新所有已安装版本( gotip 除外 )。
@@ -97,20 +98,23 @@ smart-go-dl list
 --------------------------------------------------------------------------------
 version              latest               installed
 --------------------------------------------------------------------------------
-go1.18               go1.18beta1          go1.18beta1
-go1.17               go1.17.5             go1.17.5.0     go1.17.3
-go1.16               go1.16.12            go1.16.12
+gotip                gotip                gotip
+go1.19               go1.19.2             go1.19.2     go1.19.0
+go1.18               go1.18.7             go1.18.7
+go1.17               go1.17.13            go1.17.13
+go1.16               go1.16.15            go1.16.15
 go1.15               go1.15.15            go1.15.15
-go1.14               go1.14.15            go1.14.0
-go1.13               go1.13.15            go1.13.0
+go1.14               go1.14.15            go1.14.15
+go1.13               go1.13.15            go1.13.15
 go1.12               go1.12.17            go1.12.17
-go1.11               go1.11.13            go1.11.13
-go1.10               go1.10.8             go1.10.8
-go1.9                go1.9.7              go1.9.7
+go1.11               go1.11.13
+go1.10               go1.10.8
+go1.9                go1.9.7
 go1.8                go1.8.7
 go1.7                go1.7.6
 go1.6                go1.6.4
 go1.5                go1.5.4
+[smart-go-dl] list success
 ```
 
 第一列，若是绿色，说明当前已按照最新版本，若是黄色，安装的不是最新版本。    
@@ -118,7 +122,7 @@ windows 环境下目前未做终端颜色的适配。
 
 ## 删除指定版本的 Go SDK
 ```bash
-smart-go-dl remove go1.17.3
+smart-go-dl remove go1.19.1
 ```
 
 ## 配置文件
