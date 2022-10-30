@@ -5,6 +5,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -92,7 +93,7 @@ func main() {
 	case "remove", "uninstall":
 		err = internal.Remove(args.get(2))
 	default:
-		err = fmt.Errorf("not support")
+		err = errors.New("not support")
 	}
 
 	if err != nil {

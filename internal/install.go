@@ -7,6 +7,7 @@ package internal
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -98,7 +99,7 @@ func printPATHMessage(goBinTo string) {
 }
 
 func installWithVersion(ver *Version) error {
-	gb, err := findGoBin()
+	_, err := findGoBin()
 	if err != nil {
 		// 当没有找到 go 的时候，尝试直接使用下载编译好的 go
 		err = installByArchive(ver.Raw)
@@ -107,7 +108,7 @@ func installWithVersion(ver *Version) error {
 		}
 	}
 
-	gb, err = findGoBin()
+	gb, err := findGoBin()
 	if err != nil {
 		return err
 	}
@@ -181,7 +182,7 @@ func removeGoTmpTar(version string) {
 func installVV(version string, vvs Versions) error {
 	if vvs.Get(version) != nil {
 		// 不应该执行到这个逻辑
-		return fmt.Errorf("now allow, bug here")
+		return errors.New("now allow, bug here")
 	}
 	vu, err := parserVersion(version)
 	if err != nil {
@@ -189,7 +190,7 @@ func installVV(version string, vvs Versions) error {
 	}
 	mv := vvs.Get(vu.Normalized)
 	if mv == nil {
-		return fmt.Errorf("minor version not found")
+		return errors.New("minor version not found")
 	}
 	var installVersion *Version
 	for _, pv := range mv.PatchVersions {
@@ -199,7 +200,7 @@ func installVV(version string, vvs Versions) error {
 		}
 	}
 	if installVersion == nil {
-		return fmt.Errorf("version not found")
+		return errors.New("version not found")
 	}
 	return installWithVersion(installVersion)
 }

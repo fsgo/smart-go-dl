@@ -12,8 +12,6 @@ import (
 	"github.com/fsgo/cmdutils"
 )
 
-var staticVersions Versions
-
 //go:embed files/golang_dl.tar.gz
 var golangDlTar []byte
 

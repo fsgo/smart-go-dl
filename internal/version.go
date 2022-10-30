@@ -21,11 +21,11 @@ type Version struct {
 	// 原始的版本号，如 go1.10，go1.9rc2，go1.18beta1
 	Raw string
 
-	// 归一化的值，值越大表示版本越新
-	Num int
-
 	// 归一化的，如 go1.17
 	Normalized string
+
+	// 归一化的值，值越大表示版本越新
+	Num int
 }
 
 // String 格式化输出
