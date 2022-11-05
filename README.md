@@ -9,10 +9,8 @@ Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新
 ```bash
 export GOBIN=$HOME/go/bin   # go install 安装的二进制文件所在目录，go1.x命令也将安装到此目录
 
-export PATH=$PATH:$GOBIN    # 可以直接在任意位置使用 GOBIN 目录下的所有命令
+export PATH=$GOBIN:$PATH    # 可以直接在任意位置使用 GOBIN 目录下的所有命令
 ```
-若之前安装的 `go1.x` 命令(`go`命令不受影响)不在上述 `$GOBIN` 路径里，请删除掉或者移动到 `$GOBIN` 里，
-以避免使用`smart-go-dl` install 或者 clean 后，使用命令 `go1.x`(如 go.16) 使用的是旧版本的。
 
 ## 安装/更新
 未安装过 Go 的，请先在 https://go.dev/dl/ 下载安装 Go，
@@ -35,13 +33,18 @@ smart-go-dl -help
 smart-go-dl install go1.19
 ```
 会自动找到`go1.19` 最新的版本进行安装，并安装为 `$GOBIN/go1.19.2` 和 `$GOBIN/go1.19`。  
-如当前 go1.19 的最新版本是 `go1.19.2`，则上述 `$GOBIN/go1.19` 是 `$GOBIN/go1.19.2` 的软连接。
+如当前 go1.19 的最新版本是 `go1.19.2`，则上述 `$GOBIN/go1.19` 是 `$GOBIN/go1.19.2` 的软连接。  
 
-在使用的时候，可以直接使用 `go1.19` 或者 `go1.19.2`：
+安装或更新后，会创建软连 `$GOBIN/go.latest`，其为当前安装的最新版本。
+若 `$GOBIN/go` 不存在，则也会创建这个软连接，相当于 `ln -s go.latest go`,即这个 `$GOBIN/go`总是最新版本的 go。
+
+在使用的时候，可以直接使用 `go`、`go.latest`、`go1.19`、`go1.19.2` 之一：
 ```bash
 # go1.19 version
 或者
 # go1.19.2 version
+或者
+# go version
 ```
 输出：
 ```
@@ -136,7 +139,8 @@ smart-go-dl remove go1.19.1
 # InsecureSkipVerify = true
 
 # 下载 Go tar 文件的地址前缀，可选
-# 默认值是 "https://dl.google.com/go/"
+# 会一次使用每个地址进行尝试
+# 默认值是 "https://dl.google.com/go/,https://dl-ssl.google.com/go/"
 #TarURLPrefix="https://dl.google.com/go/"
 ```
 该文件在不存在的时候，会尝试自动创建
@@ -145,7 +149,7 @@ smart-go-dl remove go1.19.1
 该程序使用 `$HOME/sdk/smart-go-dl/` 目录缓存数据，依赖的 https://github.com/golang/dl 
 也会自动下载到此目录下的 `golang_dl` 子目录中。  
 首次使用时会使用 `git clone` 命令下载 `golang_dl`，之后会使用 `git pull` 命令检查更新。  
-因 golang_dl 更新频率很低，也为了使用 `smart-go-dl` 时更流畅，更新时间间隔在 1 小时内，
+因 golang_dl 更新频率很低，也为了使用 `smart-go-dl` 时更流畅，更新时间间隔在 1 分钟内，
 再次使用时不会使用 `git pull` 检查更新。  
 若因为某些原因，git 命令下载和更新不能正常工作，也可以手工创建和更新该目录。
 

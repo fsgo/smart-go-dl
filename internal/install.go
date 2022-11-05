@@ -27,6 +27,8 @@ func Install(version string) error {
 	if err != nil {
 		return err
 	}
+	defer installGoLatestBin()
+
 	mv := versions.Get(version)
 	if mv == nil {
 		// 用于支持安装 3 位版本，如  go1.16.0、go1.16.3
@@ -53,20 +55,8 @@ func Install(version string) error {
 
 	// create link for go bin
 	// go1.16.6 -> go1.16
-	{
-		if err = os.Remove(goBinLink); err != nil && !os.IsNotExist(err) {
-			return err
-		}
-		if isWindows() {
-			if err = copyFile(goBinTo, goBinLink); err != nil {
-				return err
-			}
-		} else {
-			if err = os.Symlink(filepath.Base(goBinTo), goBinLink); err != nil {
-				return err
-			}
-		}
-		logPrint("link", goBinTo, "->", goBinLink, "success")
+	if err = createLink(goBinTo, goBinLink); err != nil {
+		return err
 	}
 
 	// create sdk dir link
@@ -85,6 +75,28 @@ func Install(version string) error {
 	}
 	log.Printf("Success. You may now run '%s'\n", version)
 	printPATHMessage(goBinTo)
+	return nil
+}
+
+func createLink(from string, to string) error {
+	from = filepath.Clean(from)
+	to = filepath.Clean(to)
+	if from == to {
+		return nil
+	}
+	if err := os.Remove(to); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if isWindows() {
+		if err := copyFile(from, to); err != nil {
+			return err
+		}
+	} else {
+		if err := os.Symlink(filepath.Base(from), to); err != nil {
+			return err
+		}
+	}
+	logPrint("link", from, "->", to, "success")
 	return nil
 }
 
@@ -164,7 +176,7 @@ func setGoEnv(cmd *exec.Cmd, gb string) {
 		logPrint("trace", "setGoEnv", err)
 		return
 	}
-	cmd.Env = append(cmd.Env,
+	cmd.Env = append(os.Environ(),
 		"GOROOT="+goROOT,
 		"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
 		"GOPATH="+filepath.Dir(GOBIN()),
@@ -333,4 +345,38 @@ func versionArchiveName(version string) string {
 func versionArchiveURLs(version string) []string {
 	name := versionArchiveName(version)
 	return defaultConfig.getTarURLs(name)
+}
+
+func installGoLatestBin() error {
+	versions, err := LastVersions()
+	if err != nil {
+		return err
+	}
+	var latest *Version
+	for _, mv := range versions {
+		for _, z := range mv.PatchVersions {
+			if z.Raw == "gotip" {
+				continue
+			}
+			if z.Installed() && (latest == nil || z.Num > latest.Num) {
+				latest = z
+			}
+		}
+	}
+	if latest == nil {
+		return nil
+	}
+	latest.NormalizedGoBinPath()
+	latestPath := filepath.Join(GOBIN(), "go.latest")
+
+	if err1 := createLink(latest.NormalizedGoBinPath(), latestPath); err1 != nil {
+		return err1
+	}
+
+	// 若是 $GOBIN/go 不存在，则创建一个软连接
+	goPath := filepath.Join(GOBIN(), "go")
+	if _, err2 := os.Stat(goPath); os.IsNotExist(err2) {
+		_ = createLink(latestPath, goPath)
+	}
+	return nil
 }

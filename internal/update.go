@@ -12,6 +12,7 @@ import (
 // Update 更新 go 版本，version 支持多种格式
 // 如 go1.16、go1.16.1、all
 func Update(version string) error {
+	defer installGoLatestBin()
 	if version == "all" || len(version) == 0 {
 		return updateAll()
 	}
@@ -30,6 +31,7 @@ func updateAll() error {
 	if err != nil {
 		return err
 	}
+
 	var failed []string
 	for _, mv := range versions {
 		if mv.NormalizedVersion == "gotip" {
