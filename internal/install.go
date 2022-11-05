@@ -115,10 +115,6 @@ func installWithVersion(ver *Version) error {
 
 	goBinTo := ver.RawGoBinPath()
 
-	// if _, err = exec.LookPath(goBinTo); err != nil {
-	// 	err = installByArchive(ver.Raw)
-	// }
-
 	if err = chdir(ver.DlDir()); err != nil {
 		return err
 	}
@@ -135,19 +131,29 @@ func installWithVersion(ver *Version) error {
 		return err
 	}
 
+	out, err1 := lookGoBinPath(goBinTo)
+	logPrint("trace", "check", goBinTo, out, err1)
+	if err1 != nil || strings.Contains(out, "not downloaded") {
+		if err2 := installByArchive(ver.Raw); err2 != nil {
+			logPrint("download", err2.Error())
+			return err2
+		}
+	}
+
 	removeGoTmpTar(ver.Raw)
 	log.Printf("Success. You may now run '%s'\n", filepath.Base(goBinTo))
 	return err
 }
 
 func printGoEnv(gb string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, gb, "env")
 	setGoEnv(cmd, gb)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	_ = cmd.Run()
+	err := cmd.Run()
+	logPrint("trace", cmd.String(), err)
 }
 
 func setGoEnv(cmd *exec.Cmd, gb string) {
@@ -155,11 +161,13 @@ func setGoEnv(cmd *exec.Cmd, gb string) {
 	fp := filepath.Join(goROOT, "api", "go1.1.txt")
 	_, err := os.Stat(fp)
 	if err != nil {
+		logPrint("trace", "setGoEnv", err)
 		return
 	}
 	cmd.Env = append(cmd.Env,
 		"GOROOT="+goROOT,
 		"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
+		"GOPATH="+filepath.Dir(GOBIN()),
 		"GOBIN="+GOBIN(),
 	)
 }
@@ -224,7 +232,7 @@ func lookGoBinPath(goFile string) (string, error) {
 		return "", err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	out, err := exec.CommandContext(ctx, gb, "version").Output()
 	if err != nil {
@@ -235,7 +243,7 @@ func lookGoBinPath(goFile string) (string, error) {
 	if bytes.HasPrefix(out, []byte("go version go")) {
 		return gb, nil
 	}
-	return "", fmt.Errorf("%s is not valid go bin", goFile)
+	return string(out), fmt.Errorf("%s is not valid go bin", goFile)
 }
 
 // 查找 ~/sdk/ 目录下已经安装的 go 版本
@@ -271,18 +279,17 @@ func installByArchive(version string) error {
 	if err = chdir(gr); err != nil {
 		return err
 	}
-	u := versionArchiveURL(version)
-	out := u[strings.LastIndex(u, "/")+1:]
-	wget := newWget()
-	logPrint("download", "from", u, "to", out)
-
-	if err = wget.Download(u, out); err != nil {
-		return fmt.Errorf("download failed: %w", err)
+	urls := versionArchiveURLs(version)
+	for _, u := range urls {
+		out := u[strings.LastIndex(u, "/")+1:]
+		if err = wget(u, out); err != nil {
+			continue
+		}
+		if err = unpackArchive(out); err == nil {
+			break
+		}
 	}
-	if err = unpackArchive(out); err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 const unpackedOkay = ".unpacked-success"
@@ -323,7 +330,7 @@ func versionArchiveName(version string) string {
 	return name
 }
 
-func versionArchiveURL(version string) string {
+func versionArchiveURLs(version string) []string {
 	name := versionArchiveName(version)
-	return defaultConfig.getTarUrL(name)
+	return defaultConfig.getTarURLs(name)
 }

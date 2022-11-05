@@ -41,15 +41,23 @@ func (c *Config) getProxy() func(*http.Request) (*url.URL, error) {
 	}
 }
 
-func (c *Config) getTarUrL(fp string) string {
-	var b strings.Builder
-	p := c.getTarURLPrefix()
-	b.WriteString(p)
-	if !strings.HasSuffix(p, "/") {
-		b.WriteString("/")
+func (c *Config) getTarURLs(fp string) []string {
+	ps := c.getTarURLPrefix()
+	var result []string
+	for _, p := range ps {
+		p = strings.TrimSpace(p)
+		if len(p) == 0 {
+			continue
+		}
+		var b strings.Builder
+		b.WriteString(p)
+		if !strings.HasSuffix(p, "/") {
+			b.WriteString("/")
+		}
+		b.WriteString(fp)
+		result = append(result, b.String())
 	}
-	b.WriteString(fp)
-	return b.String()
+	return result
 }
 
 func (c *Config) trySetProxyEnv() {
@@ -57,20 +65,21 @@ func (c *Config) trySetProxyEnv() {
 		return
 	}
 	os.Setenv("HTTP_PROXY", c.Proxy)
+	os.Setenv("http_proxy", c.Proxy)
 	os.Setenv("HTTPS_PROXY", c.Proxy)
+	os.Setenv("https_proxy", c.Proxy)
 }
 
-const tarURLPrefixDefault = "https://dl.google.com/go/"
+var tarURLPrefixDefault = []string{
+	"https://dl.google.com/go/",
+	"https://dl-ssl.google.com/go/", // 部分不能使用 tls 的尝试这个
+}
 
-func (c *Config) getTarURLPrefix() string {
+func (c *Config) getTarURLPrefix() []string {
 	if len(c.TarURLPrefix) > 0 {
-		return c.TarURLPrefix
+		return strings.Split(c.TarURLPrefix, ",")
 	}
 	return tarURLPrefixDefault
-}
-
-func (c *Config) isDefaultRarURLPrefix() bool {
-	return strings.Contains(c.getTarURLPrefix(), "dl.google.com")
 }
 
 var defaultConfig = &Config{}
@@ -95,7 +104,7 @@ func loadConfig() {
 }
 
 func printProxy() {
-	req, _ := http.NewRequest(http.MethodGet, tarURLPrefixDefault, nil)
+	req, _ := http.NewRequest(http.MethodGet, tarURLPrefixDefault[0], nil)
 	proxyFn := defaultConfig.getProxy()
 	pu, err := proxyFn(req)
 	if err != nil {
@@ -117,7 +126,7 @@ var cfgTpl = `
 # InsecureSkipVerify = true
 
 # 下载 Go tar 文件的地址前缀，可选
-# 默认值是 "https://dl.google.com/go/"
-#TarURLPrefix="https://dl.google.com/go/"
+# 默认值是 "https://dl-ssl.google.com/go/"
+#TarURLPrefix="https://dl-ssl.google.com/go/"
 
 `

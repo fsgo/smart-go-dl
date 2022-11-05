@@ -163,12 +163,8 @@ func newWget() *cmdutils.Wget {
 	gt := &cmdutils.Wget{
 		LogWriter:          os.Stderr,
 		Proxy:              defaultConfig.getProxy(),
-		ConnectTimeout:     60 * time.Second,
+		ConnectTimeout:     5 * time.Minute,
 		InsecureSkipVerify: defaultConfig.InsecureSkipVerify,
-	}
-	// 只有使用默认的下载地址的时候，才需要代理
-	if !defaultConfig.isDefaultRarURLPrefix() {
-		gt.Proxy = nil
 	}
 	return gt
 }
