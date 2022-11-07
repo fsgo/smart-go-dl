@@ -130,10 +130,8 @@ func installWithVersion(ver *Version) error {
 	if err = chdir(ver.DlDir()); err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 
-	cmd := exec.CommandContext(ctx, gb, "build", "-o", goBinTo)
+	cmd := exec.Command(gb, "build", "-o", goBinTo)
 	setGoEnv(cmd, gb)
 	logPrint("exec", cmd.String())
 	cmd.Stderr = os.Stderr
@@ -307,8 +305,14 @@ func installByArchive(version string) error {
 const unpackedOkay = ".unpacked-success"
 
 func unpackArchive(f string) (err error) {
-	logPrint("unpack", f)
+	info, err := os.Stat(f)
+	if err != nil {
+		logPrint("unpack", "error,", err)
+		return err
+	}
+	logPrint("unpack", f, "size=", info.Size())
 	defer func() {
+		logPrint("unpack", "done,", err)
 		if err != nil {
 			return
 		}

@@ -18,8 +18,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/emirpasic/gods v1.12.0 h1:QAUIPSaCu4G+POclxeqb3F+WPpdKqFGlw36+yOzGlrg=
 github.com/emirpasic/gods v1.12.0/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3ymbK86o=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
-github.com/fsgo/cmdutils v0.0.0-20220123161440-4f011c550e3c h1:aU4rKT8R+0G1CLcIjb3VO4ZRwcynyqpwOHDjw2UB5J4=
-github.com/fsgo/cmdutils v0.0.0-20220123161440-4f011c550e3c/go.mod h1:TCSVXV6QznYwGhox65AJ8blCXsDgph8WvVA4sVlMWz8=
+github.com/fsgo/cmdutils v0.0.1 h1:vF+Vf9lPbfaK8hLNvezmkLJqOM+pJACjvQBT24FslcY=
+github.com/fsgo/cmdutils v0.0.1/go.mod h1:TCSVXV6QznYwGhox65AJ8blCXsDgph8WvVA4sVlMWz8=
 github.com/gliderlabs/ssh v0.2.2 h1:6zsha5zo/TWhRhwqCD3+EarCAgZ2yN28ipRnGPnwkI0=
 github.com/gliderlabs/ssh v0.2.2/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
 github.com/go-git/gcfg v1.5.0 h1:Q5ViNfGF8zFgyJWPqYwA7qGFoMTEiBmdlkcfRmpIMa4=

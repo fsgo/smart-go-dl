@@ -65,7 +65,9 @@ func Download() error {
 }
 
 func setGitCmdEnv(cmd *exec.Cmd) {
-	cmd.Env = append(os.Environ(), "GIT_SSL_NO_VERIFY=false")
+	if defaultConfig.InsecureSkipVerify {
+		cmd.Env = append(os.Environ(), "GIT_SSL_NO_VERIFY=false")
+	}
 }
 
 var useGoGit = len(os.Getenv("Smart_Go_Dl_GoGit")) != 0
@@ -114,17 +116,23 @@ const defaultRepo = "https://github.com/golang/dl.git"
 
 func wget(url string, to string) error {
 	logPrint("download", "from", url, "to", to)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
-	defer cancel()
-	cmd1 := exec.CommandContext(ctx, "wget", "--no-check-certificate", url, "-O", to)
-	logPrint("exec", cmd1.String())
-	cmd1.Stderr = os.Stderr
-	cmd1.Stdout = os.Stdout
-	err := cmd1.Run()
-	if err == nil {
+	w1 := newWget()
+	err1 := w1.Download(url, to)
+	if err1 == nil {
 		return nil
 	}
-	logPrint("trace", "wget failed:", err)
-	w1 := newWget()
-	return w1.Download(url, to)
+
+	logPrint("go-wget", "failed:", err1, ", will retry")
+
+	var args []string
+	if defaultConfig.InsecureSkipVerify {
+		args = append(args, "--no-check-certificate")
+	}
+	args = append(args, url, "-O", to)
+	cmd1 := exec.Command("wget", args...)
+	logPrint("exec", cmd1.String())
+	cmd1.Stderr = os.Stderr
+	cmd1.Stdin = os.Stdin
+	cmd1.Stdout = os.Stdout
+	return cmd1.Run()
 }
