@@ -48,7 +48,7 @@ SubCommands:
         list all go versions that can be installed.
 
 Self-Update :
-          go install github.com/fsgo/smart-go-dl@main
+          go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.9

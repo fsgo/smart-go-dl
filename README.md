@@ -18,7 +18,7 @@ export PATH=$GOBIN:$PATH    # 可以直接在任意位置使用 GOBIN 目录下�
 
 已安装过 Go ，安装和更新：
 ```bash
-go install github.com/fsgo/smart-go-dl@main
+go install github.com/fsgo/smart-go-dl@latest
 ```
 
 
