@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fsgo/cmdutils"
+	"github.com/fsgo/cmdutil"
 )
 
 var gTmpDir string
@@ -159,8 +159,8 @@ func copyFile(src, dst string) error {
 	return err
 }
 
-func newWget() *cmdutils.Wget {
-	gt := &cmdutils.Wget{
+func newWget() *cmdutil.Wget {
+	gt := &cmdutil.Wget{
 		LogWriter:          os.Stderr,
 		Proxy:              defaultConfig.getProxy(),
 		ConnectTimeout:     5 * time.Minute,

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fsgo/cmdutils"
+	"github.com/fsgo/cmdutil"
 )
 
 // Install 安装 go1.x 的最新版本
@@ -320,12 +320,12 @@ func unpackArchive(f string) (err error) {
 	}()
 
 	if strings.HasSuffix(f, ".zip") {
-		z := &cmdutils.Zip{
+		z := &cmdutil.Zip{
 			StripComponents: 1,
 		}
 		return z.Unpack(f, "./")
 	}
-	tr := &cmdutils.Tar{
+	tr := &cmdutil.Tar{
 		StripComponents: 1,
 	}
 	return tr.Unpack(f, "./")

@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fsgo/cmdutils"
+	"github.com/fsgo/cmdutil"
 )
 
 //go:embed files/golang_dl.tar.gz
@@ -22,7 +22,7 @@ func extractGolangDLTar(dstDir string) error {
 	if err := os.WriteFile(tarPath, golangDlTar, 0644); err != nil {
 		return err
 	}
-	tr := &cmdutils.Tar{
+	tr := &cmdutil.Tar{
 		StripComponents: 1,
 	}
 	return tr.Unpack(tarPath, dstDir)
