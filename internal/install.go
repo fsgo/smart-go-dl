@@ -59,20 +59,6 @@ func Install(version string) error {
 		return err
 	}
 
-	// create sdk dir link
-	if !isWindows() {
-		sdkDir := last.Raw
-		sdkDirLink := mustGoRoot(last.Normalized) + ".latest"
-
-		if err = os.Remove(sdkDirLink); err != nil && !os.IsNotExist(err) {
-			return err
-		}
-
-		if err = os.Symlink(sdkDir, sdkDirLink); err != nil {
-			return err
-		}
-		logPrint("link", mustGoRoot(last.Raw), "->", sdkDirLink, "success")
-	}
 	log.Printf("Success. You may now run '%s'\n", version)
 	printPATHMessage(goBinTo)
 	return nil

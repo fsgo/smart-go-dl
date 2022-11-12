@@ -55,7 +55,7 @@ func (v *Version) RawFormatted() string {
 
 // NormalizedGoBinPath 归一化到 2 位版本的 gobin 的路径
 // 如 $GOBIN/go1.16、$GOBIN/go1.17
-// 在 mac、linux 下一般是一个软链，链接到当前 2 位版本的最新3位版本的gobin
+// 在 mac、linux 下一般是一个软链，链接到当前 2 位版本的最新3位版本的 gobin
 func (v *Version) NormalizedGoBinPath() string {
 	return filepath.Join(GOBIN(), v.Normalized) + exe()
 }

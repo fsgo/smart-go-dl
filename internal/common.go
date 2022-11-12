@@ -108,14 +108,6 @@ func goroot(version string) (string, error) {
 	return filepath.Join(dir, version), nil
 }
 
-func mustGoRoot(version string) string {
-	dir, err := goroot(version)
-	if err != nil {
-		panic(err)
-	}
-	return dir
-}
-
 func green(txt string) string {
 	return colorText(txt, 32)
 }
