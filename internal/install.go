@@ -31,13 +31,16 @@ func Install(version string) error {
 
 	mv := versions.Get(version)
 	if mv == nil {
+		logPrint("installVV", version)
+
 		// 用于支持安装 3 位版本，如  go1.16.0、go1.16.3
 		err = installVV(version, versions)
-		if err == nil {
-			return nil
+		if err != nil {
+			return fmt.Errorf("install %q failed: %w", version, err)
 		}
-		return fmt.Errorf("install %q failed: %w", version, err)
+		return nil
 	}
+
 	last := mv.Latest()
 
 	logPrint("install", fmt.Sprintf("found %s's latest version is %s", version, last.Raw))
@@ -117,14 +120,30 @@ func installWithVersion(ver *Version) error {
 		return err
 	}
 
-	cmd := exec.Command(gb, "build", "-o", goBinTo)
-	setGoEnv(cmd, gb)
-	logPrint("exec", cmd.String())
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	if err = cmd.Run(); err != nil {
-		printGoEnv(gb)
-		return err
+	runBuild := func(args []string) error {
+		cmd := exec.Command(gb, args...)
+		setGoEnv(cmd, gb)
+		logPrint("exec", cmd.String())
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		errBuild := cmd.Run()
+		if errBuild != nil {
+			printGoEnv(gb)
+		}
+		return errBuild
+	}
+
+	buildArgs1 := []string{"build", "-o", goBinTo}
+	errBuild := runBuild(buildArgs1)
+	if errBuild != nil {
+		logPrint("build 1", errBuild.Error())
+		// 兼容 低版本 git
+		buildArgs2 := []string{"build", "-buildvcs=false", "-o", goBinTo}
+		errBuild = runBuild(buildArgs2)
+	}
+
+	if errBuild != nil {
+		logPrint("build failed", errBuild.Error())
 	}
 
 	out, err1 := lookGoBinPath(goBinTo)

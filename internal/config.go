@@ -71,9 +71,8 @@ func (c *Config) trySetProxyEnv() {
 }
 
 var tarURLPrefixDefault = []string{
-	// "https://go.dev/dl/",
-	"https://dl.google.com/go/",
 	"https://dl-ssl.google.com/go/", // 部分不能使用 tls 的尝试这个
+	"https://dl.google.com/go/",
 }
 
 func (c *Config) getTarURLPrefix() []string {
