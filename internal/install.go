@@ -295,6 +295,8 @@ func installByArchive(version string) error {
 		return err
 	}
 	urls := versionArchiveURLs(version)
+	logPrint("trace", "urls", urls)
+
 	for _, u := range urls {
 		out := u[strings.LastIndex(u, "/")+1:]
 		if err = wget(u, out); err != nil {
@@ -353,39 +355,6 @@ func versionArchiveName(version string) string {
 
 func versionArchiveURLs(version string) []string {
 	name := versionArchiveName(version)
-	return defaultConfig.getTarURLs(name)
-}
-
-func installGoLatestBin() error {
-	versions, err := LastVersions()
-	if err != nil {
-		return err
-	}
-	var latest *Version
-	for _, mv := range versions {
-		for _, z := range mv.PatchVersions {
-			if z.Raw == "gotip" {
-				continue
-			}
-			if z.Installed() && (latest == nil || z.Num > latest.Num) {
-				latest = z
-			}
-		}
-	}
-	if latest == nil {
-		return nil
-	}
-	latest.NormalizedGoBinPath()
-	latestPath := filepath.Join(GOBIN(), "go.latest")
-
-	if err1 := createLink(latest.NormalizedGoBinPath(), latestPath); err1 != nil {
-		return err1
-	}
-
-	// 若是 $GOBIN/go 不存在，则创建一个软连接
-	goPath := filepath.Join(GOBIN(), "go")
-	if _, err2 := os.Stat(goPath); os.IsNotExist(err2) {
-		_ = createLink(latestPath, goPath)
-	}
-	return nil
+	urls := defaultConfig.getTarURLs(name)
+	return sortURLs(urls)
 }

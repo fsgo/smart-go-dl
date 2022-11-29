@@ -60,6 +60,15 @@ func (v *Version) NormalizedGoBinPath() string {
 	return filepath.Join(GOBIN(), v.Normalized) + exe()
 }
 
+// GOROOT 当前版本的 GOROOT
+func (v *Version) GOROOT() string {
+	sdk, err := goroot(v.Raw)
+	if err != nil {
+		panic(err)
+	}
+	return sdk
+}
+
 // Installed 该版本是否已经安装过了
 func (v *Version) Installed() bool {
 	sdk, err := goroot(v.Raw)

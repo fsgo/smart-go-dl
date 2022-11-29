@@ -155,7 +155,7 @@ func newWget() *cmdutil.Wget {
 	gt := &cmdutil.Wget{
 		LogWriter:          os.Stderr,
 		Proxy:              defaultConfig.getProxy(),
-		ConnectTimeout:     5 * time.Minute,
+		ConnectTimeout:     5 * time.Second,
 		InsecureSkipVerify: defaultConfig.InsecureSkipVerify,
 	}
 	return gt

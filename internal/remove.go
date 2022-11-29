@@ -16,6 +16,8 @@ func Remove(version string) error {
 }
 
 func remove(version string) error {
+	defer installGoLatestBin()
+
 	v, err := parserVersion(version)
 	if err != nil {
 		return err

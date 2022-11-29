@@ -5,11 +5,15 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -51,6 +55,7 @@ func Download() error {
 	cmdClone.Stdin = os.Stdin
 	cmdClone.Stderr = os.Stderr
 	cmdClone.Stdout = os.Stdout
+
 	if err = cmdClone.Run(); err != nil {
 		// 若直接下载失败了，则使用内置的，将其解压到对应目录下去
 		logPrint("fallback", "extract", defaultRepo, "by embed datas")
@@ -128,11 +133,76 @@ func wget(url string, to string) error {
 	if defaultConfig.InsecureSkipVerify {
 		args = append(args, "--no-check-certificate")
 	}
-	args = append(args, url, "-O", to)
+	args = append(args, "--connect-timeout=5", "--tries=1", "-O", to)
+	args = append(args, url)
 	cmd1 := exec.Command("wget", args...)
 	logPrint("exec", cmd1.String())
 	cmd1.Stderr = os.Stderr
 	cmd1.Stdin = os.Stdin
 	cmd1.Stdout = os.Stdout
 	return cmd1.Run()
+}
+
+const enableSort = false
+
+// sortURLs 对 url 地址排序，速度快的排前面
+func sortURLs(urls []string) []string {
+	if !enableSort {
+		return urls
+	}
+
+	type info struct {
+		err  error
+		url  string
+		cost time.Duration
+	}
+
+	w1 := newWget()
+	w1.LogWriter = nil
+	w1.ConnectTimeout = 3 * time.Second
+	w1.Timeout = 5 * time.Second
+
+	var items []info
+	for _, api := range urls {
+		func() {
+			start := time.Now()
+			u, err := url.Parse(api)
+			if err != nil {
+				items = append(items, info{url: api, err: err, cost: time.Hour})
+				return
+			}
+			u.Path = "/404_page"
+			bf := &bytes.Buffer{}
+			err2 := w1.DownloadToWriter(u.String(), bf)
+			item := info{
+				url:  api,
+				err:  err2,
+				cost: time.Since(start),
+			}
+
+			if err2 != nil && strings.Contains(err2.Error(), "i/o timeout") {
+				item.cost = time.Hour
+			}
+
+			// 这种认为是成功了
+			if strings.Contains(bf.String(), "text/html") {
+				item.err = nil
+			}
+			items = append(items, item)
+		}()
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		// 失败的排后面
+		if items[i].err != nil && items[j].err == nil {
+			return false
+		}
+		// 耗时少的排前面
+		return items[i].cost < items[j].cost
+	})
+	result := make([]string, 0, len(urls))
+	for _, item := range items {
+		result = append(result, item.url)
+	}
+	return result
 }

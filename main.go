@@ -47,12 +47,15 @@ SubCommands:
     list :
         list all go versions that can be installed.
 
+    fix :
+        fix links.
+
 Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.11
-Date    : 2022-11-21
+Version : 0.1.12
+Date    : 2022-11-29
 `
 
 func init() {
@@ -92,6 +95,8 @@ func main() {
 		err = internal.List()
 	case "remove", "uninstall":
 		err = internal.Remove(args.get(2))
+	case "fix":
+		err = internal.Fix()
 	default:
 		err = errors.New("not support")
 	}
