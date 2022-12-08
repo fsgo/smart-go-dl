@@ -84,6 +84,14 @@ func (v *Version) Installed() bool {
 	return err == nil
 }
 
+// IsNormal 是否正式版本，即非 beta、rc
+func (v *Version) IsNormal() bool {
+	if strings.Contains(v.Raw, "beta") || strings.Contains(v.Raw, "rc") {
+		return false
+	}
+	return true
+}
+
 // DlDir 当前版本在缓存的 golang/dl 下的路径
 func (v *Version) DlDir() string {
 	return filepath.Join(DataDir(), golangDLDir, v.Raw)

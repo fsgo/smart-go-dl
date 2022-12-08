@@ -19,16 +19,27 @@ func installGoLatestBin() error {
 		return err
 	}
 	var latest *Version
+	var def *Version
 	for _, mv := range versions {
 		for _, z := range mv.PatchVersions {
 			if z.Raw == "gotip" {
 				continue
 			}
-			if z.Installed() && (latest == nil || z.Num > latest.Num) {
-				latest = z
+			if z.Installed() {
+				if z.IsNormal() && (latest == nil || z.Num > latest.Num) {
+					latest = z
+				}
+				if def == nil {
+					def = z
+				}
 			}
 		}
 	}
+
+	if latest == nil {
+		latest = def
+	}
+
 	if latest == nil {
 		return nil
 	}
