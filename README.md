@@ -4,8 +4,7 @@ Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新
 底层使用 https://github.com/golang/dl 来进行多 Go 版本的安装。
 
 依赖：
- 1. 安装过 git，内部使用了 `git clone` 和 `git pull` 命令
- 2. 需要设置环境变量 `$GOBIN`，可参考如下进行配置：
+ 1. 需要设置环境变量 `$GOBIN`，可参考如下进行配置：
 ```bash
 export GOBIN=$HOME/go/bin   # go install 安装的二进制文件所在目录，go1.x命令也将安装到此目录
 
@@ -28,7 +27,7 @@ smart-go-dl -help
 ```
 
 ## 安装 Go SDK
-### 安装最新的 `go1.19`：
+### 安装 `go1.19` 的最新版本：
 ```bash
 smart-go-dl install go1.19
 ```
@@ -102,8 +101,9 @@ smart-go-dl list
 version              latest               installed
 --------------------------------------------------------------------------------
 gotip                gotip                gotip
-go1.19               go1.19.2             go1.19.2     go1.19.0
-go1.18               go1.18.7             go1.18.7
+go1.20               go1.20               go1.20.0
+go1.19               go1.19.5             go1.19.5     go1.19.0
+go1.18               go1.18.10            go1.18.7
 go1.17               go1.17.13            go1.17.13
 go1.16               go1.16.15            go1.16.15
 go1.15               go1.15.15            go1.15.15
