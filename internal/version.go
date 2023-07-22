@@ -21,7 +21,7 @@ type Version struct {
 	// 原始的版本号，如 go1.10，go1.9rc2，go1.18beta1
 	Raw string
 
-	// 归一化的，如 go1.17
+	// 归一化的二位版本号，如 go1.17
 	Normalized string
 
 	// 归一化的值，值越大表示版本越新
@@ -41,7 +41,7 @@ func (v *Version) RawGoBinPath() string {
 	return filepath.Join(GOBIN(), v.RawFormatted()) + exe()
 }
 
-// RawFormatted 真实的 3 位版本好，如 go1.16.1
+// RawFormatted 真实的 3 位版本号，如 go1.16.1
 // 若是 go1.16 这种第一个正式版本，会将其转换为 go1.16.0
 func (v *Version) RawFormatted() string {
 	name := v.Raw
@@ -203,6 +203,8 @@ func LastVersions() (Versions, error) {
 }
 
 // parserVersions 解析版本号列表，并按照倒序输出
+// 同一个二位版本号会去重，只保留最大的版本号
+// 解析错误的版本号回忽略掉
 func parserVersions(vs []string) (Versions, error) {
 	versions := make(map[string][]*Version)
 	for _, name := range vs {

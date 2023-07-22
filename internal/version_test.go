@@ -89,6 +89,15 @@ func Test_parserVersion(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			version: "go1.21.0",
+			want: &Version{
+				Raw:        "go1.21.0",
+				Num:        211000,
+				Normalized: "go1.21",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.version, func(t *testing.T) {
@@ -113,6 +122,8 @@ func Test_parserVersions(t *testing.T) {
 		"go1.8beta1",
 		"go1.18beta2", "go1.18rc1", "go1.18", "go1.18.1",
 		"gotip",
+		"go1.21.0", "go1.21.1",
+		"go1.22.0", "go1.22.1",
 	}
 	vs, err := parserVersions(versions)
 	require.NoError(t, err)
@@ -120,6 +131,10 @@ func Test_parserVersions(t *testing.T) {
 	for _, item := range vs {
 		got = append(got, item.Latest().Raw)
 	}
-	want := []string{"gotip", "go1.18.1", "go1.10.11", "go1.9", "go1.8beta1", "go1.7rc1", "go1.1"}
+	want := []string{
+		"gotip",
+		"go1.22.1", "go1.21.1",
+		"go1.18.1", "go1.10.11", "go1.9", "go1.8beta1", "go1.7rc1", "go1.1",
+	}
 	require.Equal(t, want, got)
 }
