@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/fsgo/fst"
 )
 
 func Test_versionReg(t *testing.T) {
@@ -126,7 +126,7 @@ func Test_parserVersions(t *testing.T) {
 		"go1.22.0", "go1.22.1",
 	}
 	vs, err := parserVersions(versions)
-	require.NoError(t, err)
+	fst.NoError(t, err)
 	var got []string
 	for _, item := range vs {
 		got = append(got, item.Latest().Raw)
@@ -136,5 +136,5 @@ func Test_parserVersions(t *testing.T) {
 		"go1.22.1", "go1.21.1",
 		"go1.18.1", "go1.10.11", "go1.9", "go1.8beta1", "go1.7rc1", "go1.1",
 	}
-	require.Equal(t, want, got)
+	fst.Equal(t, want, got)
 }
