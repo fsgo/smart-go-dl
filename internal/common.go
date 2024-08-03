@@ -19,17 +19,13 @@ import (
 
 var gTmpDir string
 
-// GetDataDir 获取当前应用的缓存目录, 路径为 ~/sdk/smart-go-dl
-func GetDataDir() (string, error) {
+// GetDataDir 获取当前应用的缓存目录, 默认路径为 ~/sdk/smart-go-dl
+func GetDataDir() string {
 	if len(gTmpDir) != 0 {
-		return gTmpDir, nil
+		return gTmpDir
 	}
-	sdk, err := sdkRoot()
-	if err != nil {
-		return "", err
-	}
-	gTmpDir = filepath.Join(sdk, "smart-go-dl")
-	return gTmpDir, nil
+	sdk := defaultConfig.getSDKDir()
+	return filepath.Join(sdk, "smart-go-dl")
 }
 
 func chdir(dir string) error {
@@ -47,11 +43,7 @@ func DataDir() string {
 	if len(gTmpDir) != 0 {
 		return gTmpDir
 	}
-	t, err := GetDataDir()
-	if err != nil {
-		panic(err)
-	}
-	return t
+	return GetDataDir()
 }
 
 var goBinPath string
@@ -101,10 +93,7 @@ func isWindows() bool {
 }
 
 func goroot(version string) (string, error) {
-	dir, err := sdkRoot()
-	if err != nil {
-		return "", err
-	}
+	dir := defaultConfig.getSDKDir()
 	return filepath.Join(dir, version), nil
 }
 
@@ -118,14 +107,6 @@ func yellow(txt string) string {
 
 func colorText(txt string, color int) string {
 	return fmt.Sprintf("\x1b[0;%dm%s\x1b[0m", color, txt)
-}
-
-func sdkRoot() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
-	return filepath.Join(home, "sdk"), nil
 }
 
 func getOS() string {

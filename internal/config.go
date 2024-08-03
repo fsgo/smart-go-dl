@@ -5,6 +5,7 @@
 package internal
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -30,6 +31,10 @@ type Config struct {
 
 	// InsecureSkipVerify 是否跳过证书校验
 	InsecureSkipVerify bool
+
+	// SDKDir 安装目录，可选，默认为 ~/sdk/
+	// 不同的 Go 版本在 SDKDir 中以子目录方式存在，如 ~/sdk/go1.22.0/
+	SDKDir string
 }
 
 func (c *Config) getProxy() func(*http.Request) (*url.URL, error) {
@@ -39,6 +44,18 @@ func (c *Config) getProxy() func(*http.Request) (*url.URL, error) {
 	return func(request *http.Request) (*url.URL, error) {
 		return url.Parse(c.Proxy)
 	}
+}
+
+func (c *Config) getSDKDir() string {
+	if c.SDKDir != "" {
+		return c.SDKDir
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		err1 := fmt.Errorf("failed to get home directory: %w", err)
+		panic(err1)
+	}
+	return filepath.Join(home, "sdk")
 }
 
 func (c *Config) getTarURLs(fp string) []string {
@@ -85,7 +102,11 @@ func (c *Config) getTarURLPrefix() []string {
 var defaultConfig = &Config{}
 
 func loadConfig() {
-	fp := filepath.Join(DataDir(), "app.toml")
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	fp := filepath.Join(home, ".config", "smart-go-dl", "app.toml")
 	logPrint("config", fp)
 	content, err := os.ReadFile(fp)
 	if err != nil && os.IsNotExist(err) {
@@ -101,6 +122,7 @@ func loadConfig() {
 	cfg.TarURLPrefix = strings.TrimSpace(cfg.TarURLPrefix)
 	defaultConfig = cfg
 	cfg.trySetProxyEnv()
+	logPrint("sdk dir", cfg.getSDKDir())
 }
 
 func printProxy() {
@@ -129,4 +151,7 @@ var cfgTpl = `
 # 默认值是 "https://dl-ssl.google.com/go/"
 #TarURLPrefix="https://dl-ssl.google.com/go/"
 
+# 安装目录，可选，默认为 ~/sdk
+# 不同的 Go 版本在 SDKDir 中以子目录方式存在，如 ~/sdk/go1.22.0/
+# SDKDir = "D:\\soft\\sdk\\"
 `

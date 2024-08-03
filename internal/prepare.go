@@ -4,31 +4,18 @@
 
 package internal
 
-import (
-	"os"
-)
-
 // Prepare 在其他正式命令之前的预处理逻辑
 func Prepare() error {
-	dataDir, err := GetDataDir()
-	if err != nil {
-		return err
-	}
-
-	if err = ParserGOBIN(); err != nil {
-		return err
-	}
-
-	logPrint("data_dir", dataDir)
-
-	if err = os.MkdirAll(dataDir, 0777); err != nil && !os.IsExist(err) {
+	if err := ParserGOBIN(); err != nil {
 		return err
 	}
 
 	loadConfig()
 	printProxy()
+	dataDir := DataDir()
+	logPrint("data dir", dataDir)
 
-	if err = chdir(dataDir); err != nil {
+	if err := chdir(dataDir); err != nil {
 		return err
 	}
 	return Download()

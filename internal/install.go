@@ -188,13 +188,10 @@ func setGoEnv(cmd *exec.Cmd, gb string) {
 }
 
 func removeGoTmpTar(version string) {
-	sdk, err := sdkRoot()
-	if err != nil {
-		return
-	}
+	sdkDir := defaultConfig.getSDKDir()
 	name := versionArchiveName(version)
-	tmpTar := filepath.Join(sdk, version, name)
-	_, err = os.Stat(tmpTar)
+	tmpTar := filepath.Join(sdkDir, version, name)
+	_, err := os.Stat(tmpTar)
 	if err == nil {
 		logPrint("remove", tmpTar)
 		_ = os.Remove(tmpTar)
@@ -263,11 +260,8 @@ func lookGoBinPath(goFile string) (string, error) {
 
 // 查找 ~/sdk/ 目录下已经安装的 go 版本
 func findGoInSdkDir() string {
-	sr, err := sdkRoot()
-	if err != nil {
-		return ""
-	}
-	ms, err := filepath.Glob(filepath.Join(sr, "go*"))
+	sdkDir := defaultConfig.getSDKDir()
+	ms, err := filepath.Glob(filepath.Join(sdkDir, "go*"))
 	if err != nil {
 		return ""
 	}
