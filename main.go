@@ -8,6 +8,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -54,8 +55,8 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.14
-Date    : 2023-02-05
+Version : 0.1.15
+Date    : 2024-08-05
 `
 
 func init() {
@@ -70,13 +71,27 @@ func main() {
 	flag.Parse()
 
 	args := stringSlice(os.Args)
+	// fmt.Println(os.Args)
+	// for _, v := range os.Environ() {
+	//	fmt.Println(v)
+	// }
+
+	log.SetOutput(io.Discard)
+	if err := internal.Prepare1(); err != nil {
+		log.SetOutput(os.Stderr)
+		log.Fatalln(err)
+	}
+
+	log.SetOutput(os.Stderr)
+	internal.TryRunGo(args.get(0))
+
+	if err := internal.Prepare2(); err != nil {
+		log.Fatalln(err)
+	}
+
 	if len(args) < 2 || args.get(1) == "help" {
 		flag.Usage()
 		return
-	}
-
-	if err := internal.Prepare(); err != nil {
-		log.Fatalln(err)
 	}
 
 	var err error

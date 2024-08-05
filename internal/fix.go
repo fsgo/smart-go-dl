@@ -44,22 +44,17 @@ func installGoLatestBin() error {
 		return nil
 	}
 	latest.NormalizedGoBinPath()
-	latestBinPath := filepath.Join(GOBIN(), "go.latest")
+
+	latestBinPath := filepath.Join(GOBIN(), "go.latest"+exe())
 
 	if err1 := createLink(latest.NormalizedGoBinPath(), latestBinPath); err1 != nil {
 		return err1
 	}
 
 	// 若是 $GOBIN/go 不存在，则创建一个软连接
-	goPath := filepath.Join(GOBIN(), "go")
+	goPath := filepath.Join(GOBIN(), "go"+exe())
 	if _, err2 := os.Stat(goPath); os.IsNotExist(err2) {
 		_ = createLink(latestBinPath, goPath)
-	}
-
-	// 给最后的
-	latestGoRoot, _ := goroot("go1.latest")
-	if len(latestGoRoot) > 0 {
-		_ = createLink(latest.GOROOT(), latestGoRoot)
 	}
 
 	return nil

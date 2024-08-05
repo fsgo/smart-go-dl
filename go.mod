@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.4.0
-	github.com/fsgo/cmdutil v0.0.5
+	github.com/fsgo/cmdutil v0.0.6-0.20240805065534-fda295db3ec1
 	github.com/fsgo/fst v0.0.3
 	github.com/go-git/go-git/v5 v5.12.0
 )
@@ -26,7 +26,7 @@ require (
 	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/mod v0.19.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect

@@ -22,6 +22,8 @@ import (
 )
 
 // Install 安装 go1.x 的最新版本
+//
+// version: 版本号，如 1.21
 func Install(version string) error {
 	versions, err := LastVersions()
 	if err != nil {
@@ -109,41 +111,11 @@ func installWithVersion(ver *Version) error {
 		}
 	}
 
-	gb, err := findGoBin()
-	if err != nil {
-		return err
-	}
-
 	goBinTo := ver.RawGoBinPath()
 
-	if err = chdir(ver.DlDir()); err != nil {
+	if err = copyFile(os.Args[0], goBinTo); err != nil {
+		logPrint("install", err)
 		return err
-	}
-
-	runBuild := func(args []string) error {
-		cmd := exec.Command(gb, args...)
-		setGoEnv(cmd, gb)
-		logPrint("exec", cmd.String())
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
-		errBuild := cmd.Run()
-		if errBuild != nil {
-			printGoEnv(gb)
-		}
-		return errBuild
-	}
-
-	buildArgs1 := []string{"build", "-o", goBinTo}
-	errBuild := runBuild(buildArgs1)
-	if errBuild != nil {
-		logPrint("build 1", errBuild.Error())
-		// 兼容 低版本 git
-		buildArgs2 := []string{"build", "-buildvcs=false", "-o", goBinTo}
-		errBuild = runBuild(buildArgs2)
-	}
-
-	if errBuild != nil {
-		logPrint("build failed", errBuild.Error())
 	}
 
 	out, err1 := lookGoBinPath(goBinTo)
@@ -177,7 +149,6 @@ func setGoEnv(cmd *exec.Cmd, gb string) {
 	_, err := os.Stat(fp)
 	if err != nil {
 		logPrint("trace", "setGoEnv", err)
-		return
 	}
 	cmd.Env = append(os.Environ(),
 		"GOROOT="+goROOT,

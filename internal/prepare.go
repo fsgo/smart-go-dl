@@ -4,13 +4,17 @@
 
 package internal
 
-// Prepare 在其他正式命令之前的预处理逻辑
-func Prepare() error {
+func Prepare1() error {
 	if err := ParserGOBIN(); err != nil {
 		return err
 	}
 
 	loadConfig()
+	return nil
+}
+
+// Prepare2 在其他正式命令之前的预处理逻辑
+func Prepare2() error {
 	printProxy()
 	dataDir := DataDir()
 	logPrint("data dir", dataDir)

@@ -87,6 +87,10 @@ func (c *Config) trySetProxyEnv() {
 	os.Setenv("https_proxy", c.Proxy)
 }
 
+func SDKRootDir() string {
+	return defaultConfig.getSDKDir()
+}
+
 var tarURLPrefixDefault = []string{
 	"https://dl-ssl.google.com/go/", // 部分不能使用 tls 的尝试这个
 	"https://dl.google.com/go/",

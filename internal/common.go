@@ -123,6 +123,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
+	_ = os.Remove(dst)
 	df, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_RDWR, si.Mode())
 	if err != nil {
 		return err
