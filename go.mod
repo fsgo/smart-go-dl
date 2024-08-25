@@ -4,8 +4,8 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.4.0
-	github.com/fsgo/cmdutil v0.0.6-0.20240805065534-fda295db3ec1
-	github.com/fsgo/fst v0.0.3
+	github.com/fsgo/cmdutil v0.0.6
+	github.com/fsgo/fst v0.0.5
 	github.com/go-git/go-git/v5 v5.12.0
 )
 
