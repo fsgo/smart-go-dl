@@ -114,9 +114,11 @@ func getOS() string {
 }
 
 func copyFile(src, dst string) error {
+	logPrint("trace", "copyFile", src, "->", dst)
 	sf, err := os.Open(src)
 	if err != nil {
-		return err
+		wd, _ := os.Getwd()
+		return fmt.Errorf("wd=%q, os.Open(%q) %w", wd, src, err)
 	}
 	defer sf.Close()
 	si, err := sf.Stat()
@@ -135,6 +137,7 @@ func copyFile(src, dst string) error {
 
 func newWget() *cmdutil.Wget {
 	gt := &cmdutil.Wget{
+		Timeout:            10 * time.Minute,
 		LogWriter:          os.Stderr,
 		Proxy:              defaultConfig.getProxy(),
 		ConnectTimeout:     5 * time.Second,

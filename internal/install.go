@@ -54,6 +54,7 @@ func Install(version string) error {
 	}
 
 	goBinLink := last.NormalizedGoBinPath()
+	logPrint("trace", "goBinLink=", goBinLink, "goBinTo=", goBinTo)
 	if goBinLink == goBinTo {
 		return nil
 	}
@@ -102,6 +103,7 @@ func printPATHMessage(goBinTo string) {
 }
 
 func installWithVersion(ver *Version) error {
+	logPrint("trace", "installWithVersion", ver.String())
 	_, err := findGoBin()
 	if err != nil {
 		// 当没有找到 go 的时候，尝试直接使用下载编译好的 go
@@ -113,8 +115,13 @@ func installWithVersion(ver *Version) error {
 
 	goBinTo := ver.RawGoBinPath()
 
-	if err = copyFile(os.Args[0], goBinTo); err != nil {
-		logPrint("install", err)
+	// smart-go-dl 可以将自己重命名为 go，并支持运行的时候使用 go download 下载 sdk 文件
+	selfPath := os.Getenv("_")
+	if selfPath == "" {
+		selfPath = os.Args[0]
+	}
+	if err = copyFile(selfPath, goBinTo); err != nil {
+		logPrint("install(wv)", err)
 		return err
 	}
 

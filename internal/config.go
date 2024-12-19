@@ -92,8 +92,10 @@ func SDKRootDir() string {
 }
 
 var tarURLPrefixDefault = []string{
+	"https://go.dev/dl/",
 	"https://dl-ssl.google.com/go/", // 部分不能使用 tls 的尝试这个
 	"https://dl.google.com/go/",
+	// "https://studygolang.com/dl/golang/",
 }
 
 func (c *Config) getTarURLPrefix() []string {
@@ -105,15 +107,20 @@ func (c *Config) getTarURLPrefix() []string {
 
 var defaultConfig = &Config{}
 
-func loadConfig() {
+func configPath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
-	fp := filepath.Join(home, ".config", "smart-go-dl", "app.toml")
+	return filepath.Join(home, ".config", "smart-go-dl", "app.toml")
+}
+
+func loadConfig() {
+	fp := configPath()
 	logPrint("config", fp)
 	content, err := os.ReadFile(fp)
 	if err != nil && os.IsNotExist(err) {
+		_ = os.MkdirAll(filepath.Dir(fp), 0755)
 		_ = os.WriteFile(fp, []byte(cfgTpl), 0644)
 		return
 	}

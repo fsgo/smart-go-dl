@@ -15,6 +15,8 @@ func Prepare1() error {
 
 // Prepare2 在其他正式命令之前的预处理逻辑
 func Prepare2() error {
+	logPrint("config", configPath())
+
 	printProxy()
 	dataDir := DataDir()
 	logPrint("data dir", dataDir)

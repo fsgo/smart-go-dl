@@ -55,8 +55,8 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.15
-Date    : 2024-08-05
+Version : 0.1.16
+Date    : 2024-12-16
 `
 
 func init() {
@@ -75,6 +75,7 @@ func main() {
 	// for _, v := range os.Environ() {
 	//	fmt.Println(v)
 	// }
+	// return
 
 	log.SetOutput(io.Discard)
 	if err := internal.Prepare1(); err != nil {
@@ -82,8 +83,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	log.SetOutput(os.Stderr)
 	internal.TryRunGo(args.get(0))
+
+	log.SetOutput(os.Stderr)
 
 	if err := internal.Prepare2(); err != nil {
 		log.Fatalln(err)
