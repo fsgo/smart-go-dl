@@ -1,12 +1,13 @@
 package internal
 
 import (
-	"github.com/fsgo/cmdutil/gosdk"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/fsgo/cmdutil/gosdk"
 )
 
 var goCMDReg = regexp.MustCompile(`^go1\.\d+`)

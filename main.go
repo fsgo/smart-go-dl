@@ -56,7 +56,7 @@ Self-Update :
 
 Site    : https://github.com/fsgo/smart-go-dl
 Version : 0.1.16
-Date    : 2024-12-16
+Date    : 2025-07-08
 `
 
 func init() {
@@ -68,8 +68,6 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
-
 	args := stringSlice(os.Args)
 	// fmt.Println(os.Args)
 	// for _, v := range os.Environ() {
@@ -84,6 +82,8 @@ func main() {
 	}
 
 	internal.TryRunGo(args.get(0))
+
+	flag.Parse()
 
 	log.SetOutput(os.Stderr)
 
