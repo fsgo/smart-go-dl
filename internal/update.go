@@ -5,29 +5,30 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"os"
 )
 
 // Update 更新 go 版本，version 支持多种格式
 // 如 go1.16、go1.16.1、all
-func Update(version string) error {
-	defer installGoLatestBin()
+func Update(ctx context.Context, version string) error {
+	defer installGoLatestBin(ctx)
 	if version == "all" || len(version) == 0 {
-		return updateAll()
+		return updateAll(ctx)
 	}
-	return update(version)
+	return update(ctx, version)
 }
 
-func update(version string) error {
-	if err := Install(version); err != nil {
+func update(ctx context.Context, version string) error {
+	if err := Install(ctx, version); err != nil {
 		return err
 	}
-	return Clean(version)
+	return Clean(ctx, version)
 }
 
-func updateAll() error {
-	versions, err := LastVersions()
+func updateAll(ctx context.Context) error {
+	versions, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,7 @@ func updateAll() error {
 			continue
 		}
 		if mv.Installed() {
-			if err = update(mv.NormalizedVersion); err != nil {
+			if err = update(ctx, mv.NormalizedVersion); err != nil {
 				logPrint("update", mv.NormalizedVersion, "failed:", err)
 				failed = append(failed, mv.NormalizedVersion)
 			} else {

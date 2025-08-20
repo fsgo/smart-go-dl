@@ -1,7 +1,7 @@
 # smart-go-dl
 Go 多版本管理辅助工具, 可以快速安装 Go ( 次要版本 ) 的最新版本，并对过期版本进行清理。  
 
-底层使用 https://github.com/golang/dl 来进行多 Go 版本的安装。
+使用 https://github.com/golang/dl 以获取 Go 版本列表。
 
 依赖：
  1. 需要设置环境变量 `$GOBIN`，可参考如下进行配置：
@@ -27,30 +27,30 @@ smart-go-dl -help
 ```
 
 ## 安装 Go SDK
-### 安装 `go1.22` 的最新版本：
+### 安装 `go1.25` 的最新版本：
 ```bash
-smart-go-dl install go1.22
+smart-go-dl install go1.25
 ```
-会自动找到`go1.22` 最新的版本进行安装，并安装为 `$GOBIN/go1.22.5` 和 `$GOBIN/go1.22`。  
-如当前 go1.11 的最新版本是 `go1.22.5`，则上述 `$GOBIN/go1.22` 是 `$GOBIN/go1.22.5` 的软连接。  
+会自动找到`go1.25` 最新的版本进行安装，并安装为 `$GOBIN/go1.25.0` 和 `$GOBIN/go1.25`。  
+如当前 go1.25 的最新版本是 `go1.25.5`，则上述 `$GOBIN/go1.22` 是 `$GOBIN/go1.22.5` 的软连接。  
 
 安装或更新后，会创建软连 `$GOBIN/go.latest`，其为当前安装的最新版本。
 若 `$GOBIN/go` 不存在，则也会创建这个软连接，相当于 `ln -s go.latest go`,即这个 `$GOBIN/go`总是最新版本的 go。
 
-在使用的时候，可以直接使用 `go`、`go.latest`、`go1.22`、`go1.22.5` 之一：
+在使用的时候，可以直接使用 `go`、`go.latest`、`go1.25`、`go1.25.0` 之一：
 ```bash
-# go1.22 version
+# go1.25 version
 或者
-# go1.22.5 version
+# go1.25.0 version
 或者
 # go version
 ```
 输出：
 ```
-go version go1.22.5 darwin/amd64
+go version go1.25.0 darwin/amd64
 ```
 
-以后有新的版本了，重新使用 `smart-go-dl install/update go1.22` 即可安装最新版本。
+以后有新的版本了，重新使用 `smart-go-dl install/update go1.25` 即可安装最新版本。
 
 使用其他版本示例：
 ```

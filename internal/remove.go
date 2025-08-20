@@ -5,18 +5,19 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
 )
 
 // Remove 删除指定的版本
-func Remove(version string) error {
-	return remove(version)
+func Remove(ctx context.Context, version string) error {
+	return remove(ctx, version)
 }
 
-func remove(version string) error {
-	defer installGoLatestBin()
+func remove(ctx context.Context, version string) error {
+	defer installGoLatestBin(ctx)
 
 	v, err := parserVersion(version)
 	if err != nil {
@@ -46,7 +47,7 @@ func remove(version string) error {
 		return err
 	}
 
-	vs, err := LastVersions()
+	vs, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}

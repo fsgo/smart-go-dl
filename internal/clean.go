@@ -5,14 +5,15 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 )
 
 // Clean 将go1.x的老版本删除掉
-func Clean(version string) error {
-	versions, err := LastVersions()
+func Clean(ctx context.Context, version string) error {
+	versions, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}

@@ -8,43 +8,50 @@ import (
 	"strings"
 
 	"github.com/fsgo/cmdutil/gosdk"
+	"golang.org/x/net/context"
 )
 
 var goCMDReg = regexp.MustCompile(`^go1\.\d+`)
 
 // TryRunGo 尝试运行 go 命令，如 go env
-func TryRunGo(name string) {
+func TryRunGo(ctx context.Context, name string) {
 	name = strings.TrimRight(filepath.Base(name), exe())
 	if name == "go" || name == "go.latest" {
-		runLatest()
-		return
+		closeFile := TrySetLogFile("go")
+		log.Println("TryRunGo：", name)
+		defer closeFile()
+		runLatest(ctx)
 	}
 
 	if goCMDReg.MatchString(name) {
-		run(name)
+		closeFile := TrySetLogFile("go")
+		log.Println("TryRunGo：", name)
+		defer closeFile()
+		run(ctx, name)
 	}
 }
 
-func runLatest() {
+func runLatest(ctx context.Context) {
 	sd := &gosdk.SDK{
 		ExtDirs: []string{SDKRootDir()},
 	}
-	goBin := sd.Latest()
+	goBin := sd.Latest(ctx)
+	log.Println("runLatest, goBin=", goBin)
 	if goBin == "" {
 		log.Fatalln("not found go")
 	}
 	root := filepath.Dir(filepath.Dir(goBin))
-	gosdk.RunGo(root)
+	gosdk.RunGo(ctx, root)
 }
 
-func run(version string) {
+func run(ctx context.Context, version string) {
 	log.SetFlags(0)
 
 	sd := &gosdk.SDK{
 		ExtDirs: []string{SDKRootDir()},
 	}
 
-	goBin := sd.Find(version)
+	goBin := sd.Find(ctx, version)
 	if goBin == "" {
 		log.Fatalln("not found", version)
 	}
@@ -62,5 +69,5 @@ func run(version string) {
 		log.Fatalf("%s: not downloaded. Run '%s download' to install to %v", version, version, root)
 	}
 
-	gosdk.RunGo(root)
+	gosdk.RunGo(ctx, root)
 }

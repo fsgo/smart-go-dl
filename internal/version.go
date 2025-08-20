@@ -5,6 +5,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -189,7 +190,7 @@ func (vs Versions) Get(version string) *MinorVersion {
 }
 
 // LastVersions 获取 golang/dl里所有的版本信息
-func LastVersions() (Versions, error) {
+func LastVersions(ctx context.Context) (Versions, error) {
 	pt := filepath.Join(DataDir(), golangDLDir, "go1.*")
 	matches, err := filepath.Glob(pt)
 	if err != nil {

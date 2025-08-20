@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -55,8 +56,8 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.16
-Date    : 2025-07-08
+Version : 0.1.17
+Date    : 2025-08-20
 `
 
 func init() {
@@ -68,6 +69,9 @@ func init() {
 }
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	args := stringSlice(os.Args)
 	// fmt.Println(os.Args)
 	// for _, v := range os.Environ() {
@@ -81,11 +85,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	internal.TryRunGo(args.get(0))
-
-	flag.Parse()
+	internal.TryRunGo(ctx, args.get(0))
 
 	log.SetOutput(os.Stderr)
+	closeFile := internal.TrySetLogFile("default")
+	defer closeFile()
+
+	flag.Parse()
 
 	if err := internal.Prepare2(); err != nil {
 		log.Fatalln(err)
@@ -99,21 +105,21 @@ func main() {
 	var err error
 	switch args[1] {
 	case "install":
-		err = internal.Install(args.get(2))
+		err = internal.Install(ctx, args.get(2))
 	case "clean":
-		err = internal.Clean(args.get(2))
+		err = internal.Clean(ctx, args.get(2))
 	case "update":
-		err = internal.Update(args.get(2))
+		err = internal.Update(ctx, args.get(2))
 	case "lock":
 		err = internal.Lock(args.get(2), "add")
 	case "unlock":
 		err = internal.Lock(args.get(2), "remove")
 	case "list":
-		err = internal.List()
+		err = internal.List(ctx)
 	case "remove", "uninstall":
-		err = internal.Remove(args.get(2))
+		err = internal.Remove(ctx, args.get(2))
 	case "fix":
-		err = internal.Fix()
+		err = internal.Fix(ctx)
 	default:
 		err = errors.New("not support")
 	}

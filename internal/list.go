@@ -5,13 +5,14 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"strings"
 )
 
 // List 列出已安装和可安装的 go 版本
-func List() error {
-	versions, err := LastVersions()
+func List(ctx context.Context) error {
+	versions, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}

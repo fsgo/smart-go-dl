@@ -5,16 +5,17 @@
 package internal
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 )
 
-func Fix() error {
-	return installGoLatestBin()
+func Fix(ctx context.Context) error {
+	return installGoLatestBin(ctx)
 }
 
-func installGoLatestBin() error {
-	versions, err := LastVersions()
+func installGoLatestBin(ctx context.Context) error {
+	versions, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}

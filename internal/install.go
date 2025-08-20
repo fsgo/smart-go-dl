@@ -5,8 +5,8 @@
 package internal
 
 import (
-	"bytes"
 	"context"
+	"debug/buildinfo"
 	"errors"
 	"fmt"
 	"log"
@@ -24,12 +24,12 @@ import (
 // Install 安装 go1.x 的最新版本
 //
 // version: 版本号，如 1.21
-func Install(version string) error {
-	versions, err := LastVersions()
+func Install(ctx context.Context, version string) error {
+	versions, err := LastVersions(ctx)
 	if err != nil {
 		return err
 	}
-	defer installGoLatestBin()
+	defer installGoLatestBin(ctx)
 
 	mv := versions.Get(version)
 	if mv == nil {
@@ -120,10 +120,15 @@ func installWithVersion(ver *Version) error {
 	if selfPath == "" {
 		selfPath = os.Args[0]
 	}
-	if err = copyFile(selfPath, goBinTo); err != nil {
-		logPrint("install(wv)", err)
-		return err
+
+	if err = createLink(selfPath, goBinTo); err != nil {
+		logPrint("createLink", selfPath, "->", goBinTo, ", err=", err)
 	}
+
+	// if err = copyFile(selfPath, goBinTo); err != nil {
+	//	logPrint("copyFile", selfPath, "->", goBinTo, "err=", err)
+	//	return err
+	// }
 
 	out, err1 := lookGoBinPath(goBinTo)
 	logPrint("trace", "check", goBinTo, out, err1)
@@ -222,18 +227,20 @@ func lookGoBinPath(goFile string) (string, error) {
 		return "", err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-	out, err := exec.CommandContext(ctx, gb, "version").Output()
+	bi, err := buildinfo.ReadFile(gb)
 	if err != nil {
 		return "", err
 	}
 
-	// 完整的 out : go version go1.16.15 darwin/amd64
-	if bytes.HasPrefix(out, []byte("go version go")) {
+	if bi.Path != "cmd/go" {
+		return "", fmt.Errorf("not cmd/go, got %q", bi.Path)
+	}
+
+	// go1.16.15
+	if strings.HasPrefix(bi.GoVersion, "go") {
 		return gb, nil
 	}
-	return string(out), fmt.Errorf("%s is not valid go bin", goFile)
+	return bi.GoVersion, fmt.Errorf("%s is not valid go bin", goFile)
 }
 
 // 查找 ~/sdk/ 目录下已经安装的 go 版本
