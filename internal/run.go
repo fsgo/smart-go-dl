@@ -57,6 +57,7 @@ func run(ctx context.Context, version string) {
 	}
 
 	if len(os.Args) == 2 && os.Args[1] == "download" {
+		loadConfig()
 		if err := installByArchive(version); err != nil {
 			log.Fatalf("%s: install failed: %v", version, err)
 		}

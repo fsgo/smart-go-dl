@@ -8,7 +8,6 @@ func Prepare1() error {
 	if err := ParserGOBIN(); err != nil {
 		return err
 	}
-
 	loadConfig()
 	return nil
 }

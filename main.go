@@ -56,15 +56,15 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.17
-Date    : 2025-08-20
+Version : 0.1.18
+Date    : 2025-10-07
 `
 
 func init() {
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
 		fmt.Fprintf(out, "Usage of %s:\n", os.Args[0])
-		fmt.Fprintf(out, strings.TrimSpace(helpMessage)+"\n")
+		fmt.Fprint(out, strings.TrimSpace(helpMessage)+"\n")
 	}
 }
 
@@ -73,19 +73,15 @@ func main() {
 	defer cancel()
 
 	args := stringSlice(os.Args)
-	// fmt.Println(os.Args)
-	// for _, v := range os.Environ() {
-	//	fmt.Println(v)
-	// }
-	// return
 
 	log.SetOutput(io.Discard)
+	// 当以 go 别名运行
+	internal.TryRunGo(ctx, args.get(0))
+
 	if err := internal.Prepare1(); err != nil {
 		log.SetOutput(os.Stderr)
 		log.Fatalln(err)
 	}
-
-	internal.TryRunGo(ctx, args.get(0))
 
 	log.SetOutput(os.Stderr)
 	closeFile := internal.TrySetLogFile("default")
