@@ -30,7 +30,9 @@ jobs:
         run: |
           mkdir -p dist
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
-          go build -o dist/smart-go-dl_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
+          CGO_ENABLED=0 \
+          go build -ldflags "-s -w" \
+          -o dist/smart-go-dl_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
