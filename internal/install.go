@@ -9,6 +9,7 @@ import (
 	"debug/buildinfo"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
@@ -16,7 +17,6 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/fsgo/cmdutil"
 )
@@ -76,7 +76,7 @@ func createLink(from string, to string) error {
 	if from == to {
 		return nil
 	}
-	if err := os.Remove(to); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(to); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 	if isWindows() {
@@ -144,32 +144,31 @@ func installWithVersion(ver *Version) error {
 	return err
 }
 
-func printGoEnv(gb string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-	cmd := exec.CommandContext(ctx, gb, "env")
-	setGoEnv(cmd, gb)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	err := cmd.Run()
-	logPrint("trace", cmd.String(), err)
-}
+// func printGoEnv(gb string) {
+//	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+//	defer cancel()
+//	cmd := exec.CommandContext(ctx, gb, "env")
+//	setGoEnv(cmd, gb)
+//	cmd.Stderr = os.Stderr
+//	cmd.Stdout = os.Stdout
+//	err := cmd.Run()
+//	logPrint("trace", cmd.String(), err)
+// }
 
-func setGoEnv(cmd *exec.Cmd, gb string) {
-	goROOT := filepath.Dir(filepath.Dir(gb))
-	fp := filepath.Join(goROOT, "api", "go1.1.txt")
-	_, err := os.Stat(fp)
-	if err != nil {
-		logPrint("trace", "setGoEnv", err)
-	}
-	cmd.Env = append(os.Environ(),
-		"GOROOT="+goROOT,
-		"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
-		"GOPATH="+filepath.Dir(GOBIN()),
-		"GOBIN="+GOBIN(),
-	)
-}
-
+//	func setGoEnv(cmd *exec.Cmd, gb string) {
+//		goROOT := filepath.Dir(filepath.Dir(gb))
+//		fp := filepath.Join(goROOT, "api", "go1.1.txt")
+//		_, err := os.Stat(fp)
+//		if err != nil {
+//			logPrint("trace", "setGoEnv", err)
+//		}
+//		cmd.Env = append(os.Environ(),
+//			"GOROOT="+goROOT,
+//			"GOCACHE="+filepath.Join(os.TempDir(), "go_build_cache"),
+//			"GOPATH="+filepath.Dir(GOBIN()),
+//			"GOBIN="+GOBIN(),
+//		)
+//	}
 func removeGoTmpTar(version string) {
 	sdkDir := defaultConfig.getSDKDir()
 	name := versionArchiveName(version)
@@ -232,7 +231,7 @@ func lookGoBinPath(goFile string) (string, error) {
 		return "", err
 	}
 
-	if bi.Path != "cmd/go" {
+	if bi.Path != "cmd/go" && bi.Path != "github.com/fsgo/smart-go-dl" {
 		return "", fmt.Errorf("not cmd/go, got %q", bi.Path)
 	}
 
@@ -267,7 +266,7 @@ func installByArchive(version string) error {
 	if err != nil {
 		return err
 	}
-	if err = os.MkdirAll(gr, 0755); err != nil && !os.IsExist(err) {
+	if err = os.MkdirAll(gr, 0755); err != nil && !errors.Is(err, fs.ErrExist) {
 		return err
 	}
 	if err = chdir(gr); err != nil {

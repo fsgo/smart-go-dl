@@ -23,9 +23,9 @@ smart-go-dl subCommand [options]
 SubCommands:
     install {go1.x} :
         install the latest go1.x, 'x' must be a number, x >= 5
-          eg: "install go1.19", then you can run "go1.19"
+          eg: "install go1.25", then you can run "go1.25"
         install the specified version:
-          eg: install go1.19.0 | go1.19.2 | gotip
+          eg: install go1.25.0 | go1.25.2 | gotip
     
     clean {go1.x} :
         clean up expired go versions.
@@ -34,17 +34,17 @@ SubCommands:
         eg: "clean go1.15"
     
     lock {go1.x.y} :
-        add lock file. eg: "lock go1.19.3"
+        add lock file. eg: "lock go1.25.3"
     
     unlock {go1.x.y} :
-        remove lock file. eg: "unlock go1.19.3"
+        remove lock file. eg: "unlock go1.25.3"
     
     update {go1.x} / all :
         alias of  "clean {go1.x}" && "install {go1.x}"
         "all": update all installed go versions, eg: "update all" or "update"
 
     remove {go1.x.y} :
-        remove patch version like 'go1.19.3'
+        remove patch version like 'go1.25.3'
     
     list :
         list all go versions that can be installed.
@@ -56,8 +56,8 @@ Self-Update :
           go install github.com/fsgo/smart-go-dl@latest
 
 Site    : https://github.com/fsgo/smart-go-dl
-Version : 0.1.18
-Date    : 2025-10-07
+Version : 0.1.19
+Date    : 2025-11-17
 `
 
 func init() {
