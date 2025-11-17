@@ -29,9 +29,8 @@ jobs:
       - name: Build binaries
         run: |
           mkdir -p dist
-          EXT=$([ "${{ matrix.goos }}" = "windows" ] && echo ".exe")
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
-          go build -o "dist/smart-go-dl_${{ matrix.goos }}_${{ matrix.goarch }}${EXT}"
+          go build -o dist/smart-go-dl_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
